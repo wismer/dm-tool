@@ -8,7 +8,6 @@ import reducers from './redux/reducers/index';
 import thunkMiddleware from 'redux-thunk';
 import { Router, Route, hashHistory } from 'react-router';
 
-
 const store = createStore(reducers, applyMiddleware(thunkMiddleware));
 
 function AppContainer() {

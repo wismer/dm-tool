@@ -1,38 +1,36 @@
-enum SpellComponent {
-  Verbal = 1;
-  Somatic = 2;
-  Material = 3;
-}
-
-export interface Spell {
-  name: string;
-  spellLevel: number;
-  desc: string;
-  components: Array<SpellComponent>;
-  spellSchool: string;
-  id: number;
-  castingTime: number;
-  reaction: boolean;
-  duration: string;
-  materialDesc: null | string;
-  range: number;
-  requiresConcentration: boolean;
-}
-
-export interface SpellList {
-  searchResults: Array<Spell>;
-  spellSchools: Array<string>;
-}
+import { Action } from 'redux';
+import { SpellList } from '../../interfaces';
+import { SPELL_QUERY_RESPONSE, SPELL_QUERY_REQUEST } from '../actions';
 
 const initialState: SpellList = {
   searchResults: [],
-  spellSchools: []
+  spellSchools: [],
+  spellQuery: null,
+  isLoading: false,
+  didErr: false,
 };
 
-export function spells(state: SpellList, action: any): SpellList {
+function querySpells(state: SpellList): SpellList {
+  return Object.assign({}, state, { isLoading: true });
+}
+
+function handleQueryResponse(state: SpellList, action: any): SpellList {
+  return Object.assign({}, state, {
+    searchResults: action.spells,
+    isLoading: false
+  });
+}
+
+export function spells(state: SpellList, action: Action): SpellList {
   if (!state) {
-    return initial
+    return initialState;
   }
 
+  switch (action.type) {
+    case SPELL_QUERY_REQUEST:
+      return querySpells(state);
+    case SPELL_QUERY_RESPONSE:
+      return handleQueryResponse(state, action);
+  }
   return state;
 }

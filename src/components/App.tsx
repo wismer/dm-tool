@@ -6,7 +6,7 @@ import { AppState } from '../interfaces';
 
 
 
-function raceProps(state: AppState): any  {
+function raceProps<T>(state: AppState<T>): any  {
   return state;
 }
 
