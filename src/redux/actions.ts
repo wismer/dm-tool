@@ -1,4 +1,4 @@
-import { AppState, Character } from '../interfaces';
+import { AppState, Character, ToolChoice } from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState;
@@ -21,6 +21,15 @@ export const SPELL_QUERY_REQUEST = 'SPELL_QUERY_REQUEST';
 function spellQueryRequest(): any {
   return {
     type: SPELL_QUERY_REQUEST,
+  };
+}
+
+export const CHANGE_TOOL = 'CHANGE_TOOL';
+
+export function changeTool(tool: ToolChoice): any {
+  return {
+    type: CHANGE_TOOL,
+    tool
   };
 }
 

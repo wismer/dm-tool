@@ -5,6 +5,12 @@ export enum SpellComponent {
   Material = 3,
 }
 
+export enum ToolChoice {
+  Encounter = 1,
+  SpellLookup = 2,
+  Other = 3
+}
+
 
 export interface Spell {
   id: number;
@@ -70,7 +76,8 @@ export interface TurnOrder extends Tool {
 }
 
 export interface ToolState {
-  turnOrder: TurnOrder,
+  turnOrder: TurnOrder;
+  activeTool: ToolChoice;
 }
 
 export interface Race {

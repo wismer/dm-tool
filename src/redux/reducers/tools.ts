@@ -1,7 +1,8 @@
-import { ToolState, TurnOrder, AppState } from '../../interfaces';
+import { ToolState, ToolChoice, TurnOrder, AppState } from '../../interfaces';
 import {
   // INIT_SAVE_CHARACTER_DM_TOOL,
-  FINISH_SAVE_CHARACTER_DM_TOOL
+  FINISH_SAVE_CHARACTER_DM_TOOL,
+  CHANGE_TOOL
 } from '../actions';
 import { Character } from '../../interfaces';
 
@@ -14,6 +15,7 @@ const initialTool: TurnOrder = {
 
 const initialState: ToolState = {
   turnOrder: initialTool,
+  activeTool: 1
 };
 
 function addCharacterToList(state: ToolState, character: any): ToolState {
@@ -26,6 +28,10 @@ function addCharacterToList(state: ToolState, character: any): ToolState {
   return Object.assign({}, state, { turnOrder })
 }
 
+function changeTool(state: ToolState, tool: ToolChoice): ToolState {
+  return Object.assign({}, state, { activeTool: tool });
+}
+
 export function tools(state: ToolState, action: any): ToolState {
   if (!state) {
     return initialState;
@@ -34,6 +40,8 @@ export function tools(state: ToolState, action: any): ToolState {
   switch (action.type) {
     case FINISH_SAVE_CHARACTER_DM_TOOL:
       return addCharacterToList(state, action.character);
+    case CHANGE_TOOL:
+      return changeTool(state, action.tool);
     default: return state;
   }
 }
