@@ -75,8 +75,31 @@ export interface TurnOrder extends Tool {
   enemies: Array<Character>;
 }
 
+export interface CharacterState extends Character {
+  intiativeRoll: number;
+  wasSurprised: boolean;
+  readiedAction: boolean;
+  currentHitPoints: number;
+  conditions: string[];
+}
+
+export interface Encounter {
+  name: string;
+  roster: Array<CharacterState>;
+  currentTurn: number;
+  id: null | number;
+  surpriseRound: boolean;
+}
+
+export interface EncounterListProps {
+  encounters: Array<Encounter>;
+  activeEncounter: null | number;
+}
+
 export interface ToolState {
   turnOrder: TurnOrder;
+  encounters: Array<Encounter>;
+  activeEncounter: null | number;
   activeTool: ToolChoice;
 }
 
@@ -99,4 +122,11 @@ export interface AppState {
   race: RaceState;
   tools: ToolState;
   spells: SpellList;
+}
+
+export interface EncounterTool extends Tool {
+  turnOrder: TurnOrder;
+  id: null | number;
+  currentTurn: number;
+  surpriseRound: boolean;
 }

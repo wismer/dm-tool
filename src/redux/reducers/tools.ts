@@ -1,4 +1,10 @@
-import { ToolState, ToolChoice, TurnOrder, AppState } from '../../interfaces';
+import {
+  ToolState,
+  ToolChoice,
+  TurnOrder,
+  AppState,
+  EncounterListProps
+ } from '../../interfaces';
 import {
   // INIT_SAVE_CHARACTER_DM_TOOL,
   FINISH_SAVE_CHARACTER_DM_TOOL,
@@ -15,7 +21,9 @@ const initialTool: TurnOrder = {
 
 const initialState: ToolState = {
   turnOrder: initialTool,
-  activeTool: 1
+  activeTool: 1,
+  encounters: [],
+  activeEncounter: null
 };
 
 function addCharacterToList(state: ToolState, character: any): ToolState {
@@ -52,4 +60,14 @@ export function characterList(state: AppState, props: any): ListState {
 
 export function addCharacterProps(state: AppState, props: any): {isOpen: boolean} {
   return props;
+}
+
+/* ENCOUNTER */
+
+export function encounterListProps(state: AppState, props: any): EncounterListProps {
+  const { tools } = state;
+  return {
+    encounters: tools.encounters,
+    activeEncounter: tools.activeEncounter
+  };
 }

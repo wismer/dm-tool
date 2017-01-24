@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as React from 'react';
 import SpellList from './SpellList';
 import { CharacterList } from './CharacterList';
+import EncounterList from './Encounter';
 import { Nav, NavItem, Col, Grid, Panel } from 'react-bootstrap';
 import { toolDispatch } from '../redux/dispatchers';
 
@@ -20,9 +21,12 @@ const DMToolsContainer = function(props: ToolChoiceProp) {
   if (props.activeTool === ToolChoice.SpellLookup) {
     content = <SpellList />;
   } else if (props.activeTool === ToolChoice.Encounter) {
-    content = <CharacterList />;
+    content = (
+      <EncounterList>
+      </EncounterList>
+    );
   } else {
-    content = <div></div>;
+    content = <div>intentionally left blank</div>;
   }
 
   return (
@@ -42,6 +46,10 @@ const DMToolsContainer = function(props: ToolChoiceProp) {
           <Panel>
             {content}
           </Panel>
+        </Col>
+
+        <Col xs={2}>
+          <CharacterList />
         </Col>
       </Grid>
     </div>
