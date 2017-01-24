@@ -5,18 +5,18 @@ import SpellList from './SpellList';
 import { CharacterList } from './CharacterList';
 import { Col } from 'react-bootstrap';
 
-function toolProps<T>(state: AppState<T>): ToolState<T> {
+function toolProps(state: AppState): ToolState {
   return state.tools;
 }
 
-const DMToolsContainer = function<T>(props: ToolState<T>) {
+const DMToolsContainer = function(props: ToolState) {
   return (
     <div id='dm-tools'>
       <Col xs={12} md={8}>
         <SpellList />
       </Col>
       <Col xs={6} md={4}>
-        <CharacterList characters={[]} />
+        <CharacterList />
       </Col>
     </div>
   );

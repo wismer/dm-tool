@@ -3,12 +3,13 @@ import { connect } from 'react-redux';
 import { Character, AddCharacterState } from '../interfaces';
 import { Form, FormGroup, FormControl, Col, ControlLabel, Panel, Button, Glyphicon } from 'react-bootstrap';
 import { characterListDispatch } from '../redux/dispatchers';
+import { characterList, addCharacterProps } from '../redux/reducers/tools';
 
 type ContainerProps = { characters: Array<Character> };
 type ContainerState = { open: boolean };
 interface CharacterProps {
   saveCharacter: (character: Character) => void;
-
+  isOpen: boolean;
 }
 
 class AddCharacterModalContainer extends React.Component<CharacterProps, AddCharacterState> {
@@ -31,6 +32,26 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
       open: false
     };
     this.handleChange = this.handleChange.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps: { isOpen: boolean }) {
+    if (!nextProps.isOpen) {
+      this.setState({
+        character: {
+          playerName: '',
+          characterName: '',
+          id: null,
+          armorClass: 8,
+          toHit: 2,
+          passiveWisdom: 8,
+          initiative: 8,
+          conditions: [],
+          currentHitPoints: 8,
+          maxHitPoints: 8,
+          isNpc: false
+        }
+      })
+    }
   }
 
   handleChange(e: any) {
@@ -125,7 +146,7 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
   }
 }
 
-const AddCharacterModal = connect(() => {}, characterListDispatch)(AddCharacterModalContainer);
+const AddCharacterModal = connect(addCharacterProps, characterListDispatch)(AddCharacterModalContainer);
 
 class CharacterListContainer extends React.Component<ContainerProps, ContainerState> {
   constructor(props: ContainerProps) {
@@ -146,17 +167,16 @@ class CharacterListContainer extends React.Component<ContainerProps, ContainerSt
         <Panel header='Characters In Encounter'>
           {list}
           <Button bsStyle='success' block onClick={() => this.setState({ open: !this.state.open })}>
-            <Glyphicon glyph='plus' />
             Add Character
           </Button>
         </Panel>
 
         <Panel collapsible expanded={this.state.open}>
-          <AddCharacterModal />
+          <AddCharacterModal isOpen={this.state.open} />
         </Panel>
       </div>
     );
   }
 }
 
-export const CharacterList = connect()(CharacterListContainer);
+export const CharacterList = connect(characterList)(CharacterListContainer);

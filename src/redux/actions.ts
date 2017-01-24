@@ -1,9 +1,9 @@
 import { AppState, Character } from '../interfaces';
 
 interface Dispatch {
-  <T>(action: any): AppState<T>;
+  (action: any): AppState;
 }
-type AppUpdate = <T>(dispatch: Dispatch, getState: () => AppState<T>) => void;
+type AppUpdate = (dispatch: Dispatch, getState: () => AppState) => void;
 
 
 export const SPELL_QUERY_RESPONSE = 'SPELL_QUERY_RESPONSE';
@@ -42,7 +42,7 @@ function finishSaveCharacter(response: any): any {
 }
 
 export function saveCharacter(character: Character): AppUpdate {
-  return <T>(dispatch: Dispatch, getState: () => AppState<T>) => {
+  return (dispatch: Dispatch, getState: () => AppState) => {
     dispatch(saveCharacterInit());
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', (response) => {
@@ -55,7 +55,7 @@ export function saveCharacter(character: Character): AppUpdate {
 }
 
 export function querySpells(query: string): AppUpdate {
-  const getSpells: AppUpdate = <T>(dispatch: Dispatch, getState: () => AppState<T>) => {
+  const getSpells: AppUpdate = (dispatch: Dispatch, getState: () => AppState) => {
     dispatch(spellQueryRequest());
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', (response) => {

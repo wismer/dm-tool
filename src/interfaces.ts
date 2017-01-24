@@ -69,9 +69,8 @@ export interface TurnOrder extends Tool {
   enemies: Array<Character>;
 }
 
-export interface ToolState<T> {
-  activeTools: Array<T>;
-  tools: Array<T>;
+export interface ToolState {
+  turnOrder: TurnOrder,
 }
 
 export interface Race {
@@ -89,8 +88,8 @@ export interface RaceState {
   races: Array<Race>;
 }
 
-export interface AppState<T> {
+export interface AppState {
   race: RaceState;
-  tools: ToolState<T>;
+  tools: ToolState;
   spells: SpellList;
 }

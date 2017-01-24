@@ -12,7 +12,7 @@ interface FormState {
   query: string;
 }
 
-function spellProps<T>(props: AppState<T>): SpellList {
+function spellProps(props: AppState): SpellList {
   return props.spells;
 }
 

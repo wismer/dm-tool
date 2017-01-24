@@ -3,7 +3,7 @@ import { AppState, Character } from '../interfaces';
 
 
 interface Dispatch {
-  <T>(action: any): AppState<T>
+  (action: any): AppState
 }
 
 export function spellListDispatchers(dispatch: Dispatch): any {
