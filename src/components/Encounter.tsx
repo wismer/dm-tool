@@ -15,6 +15,7 @@ import {
   ControlLabel
 } from 'react-bootstrap';
 import { encounterListProps } from '../redux/reducers/tools';
+import { encounterDispatch } from '../redux/dispatchers';
 /*
 ENCOUNTER
   name - text
@@ -54,7 +55,9 @@ function CharacterEncounterItem(props: CharacterState) {
   );
 }
 
-class CreateEncounterContainer extends React.Component<undefined, Encounter> {
+type Enc = { saveEncounter: (encounter: Encounter) => void };
+
+class CreateEncounterContainer extends React.Component<Enc, Encounter> {
   constructor() {
     super();
     this.state = {
@@ -64,6 +67,14 @@ class CreateEncounterContainer extends React.Component<undefined, Encounter> {
       id: null,
       surpriseRound: false
     };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e: any) {
+    let encounter = Object.assign({}, this.state);
+    encounter.name = e.target.value;
+    this.setState(encounter);
   }
 
   render() {
@@ -80,10 +91,10 @@ class CreateEncounterContainer extends React.Component<undefined, Encounter> {
       <Form horizontal>
         <FormGroup controlId='encounterName'>
           <Col componentClass={ControlLabel} sm={4}>
-            Player's Name
+            Encounter Name
           </Col>
           <Col sm={8}>
-            <FormControl value={name} type="text" placeholder="Player's Name" />
+            <FormControl onChange={this.handleChange} value={name} type="text" placeholder="Name for Encounter" />
           </Col>
         </FormGroup>
         <FormGroup controlId='roster'>
@@ -95,13 +106,15 @@ class CreateEncounterContainer extends React.Component<undefined, Encounter> {
             <ListGroup>{roster}</ListGroup>
           </Col>
         </FormGroup>
-        <Button bsStyle='success' onClick={() => {}} block>
+        <Button bsStyle='success' onClick={() => this.props.saveEncounter(this.state)} block>
           <Glyphicon glyph='plus' />
         </Button>
       </Form>
     );
   }
 }
+
+const CreateEncounter = connect(() => ({}), encounterDispatch)(CreateEncounterContainer);
 
 class EncounterListContainer extends React.Component<EncounterListProps, {open: boolean}> {
   constructor(props: EncounterListProps) {
@@ -122,7 +135,7 @@ class EncounterListContainer extends React.Component<EncounterListProps, {open: 
             Create Encounter
           </Button>
           <Panel collapsible expanded={this.state.open}>
-            <CreateEncounterContainer />
+            <CreateEncounter />
           </Panel>
           <PanelGroup activeKey={this.props.activeEncounter}>
             {encounters}

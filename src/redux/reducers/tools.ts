@@ -3,11 +3,15 @@ import {
   ToolChoice,
   TurnOrder,
   AppState,
-  EncounterListProps
+  EncounterListProps,
+  Encounter
  } from '../../interfaces';
 import {
   // INIT_SAVE_CHARACTER_DM_TOOL,
   FINISH_SAVE_CHARACTER_DM_TOOL,
+  SAVE_ENCOUNTER_INIT,
+  SAVE_ENCOUNTER_FINISH,
+  ENCOUNTER_STATE_LOAD,
   CHANGE_TOOL
 } from '../actions';
 import { Character } from '../../interfaces';
@@ -40,6 +44,18 @@ function changeTool(state: ToolState, tool: ToolChoice): ToolState {
   return Object.assign({}, state, { activeTool: tool });
 }
 
+function addEncounter(state: ToolState, encounter: Encounter) {
+  return Object.assign({}, state, {
+    encounters: [...state.encounters, encounter]
+  });
+}
+
+function loadEncounters(state: ToolState, encounters: Encounter[]): ToolState {
+  return Object.assign({}, state, {
+    encounters: encounters
+  });
+}
+
 export function tools(state: ToolState, action: any): ToolState {
   if (!state) {
     return initialState;
@@ -50,6 +66,11 @@ export function tools(state: ToolState, action: any): ToolState {
       return addCharacterToList(state, action.character);
     case CHANGE_TOOL:
       return changeTool(state, action.tool);
+    case SAVE_ENCOUNTER_INIT: return state;
+    case SAVE_ENCOUNTER_FINISH:
+      return addEncounter(state, action.encounter);
+    case ENCOUNTER_STATE_LOAD:
+      return loadEncounters(state, action.encounters);
     default: return state;
   }
 }
@@ -68,6 +89,6 @@ export function encounterListProps(state: AppState, props: any): EncounterListPr
   const { tools } = state;
   return {
     encounters: tools.encounters,
-    activeEncounter: tools.activeEncounter
+    activeEncounter: tools.activeEncounter || 1
   };
 }

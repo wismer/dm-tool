@@ -89,6 +89,7 @@ export interface Encounter {
   currentTurn: number;
   id: null | number;
   surpriseRound: boolean;
+  created?: Date
 }
 
 export interface EncounterListProps {

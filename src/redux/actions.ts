@@ -1,10 +1,12 @@
-import { AppState, Character, ToolChoice } from '../interfaces';
+import { AppState, Character, ToolChoice, Encounter } from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState;
 }
 type AppUpdate = (dispatch: Dispatch, getState: () => AppState) => void;
 
+
+export const REFRESH_ENCOUNTERS = 'REFRESH_ENCOUNTERS';
 
 export const SPELL_QUERY_RESPONSE = 'SPELL_QUERY_RESPONSE';
 
@@ -63,6 +65,38 @@ export function saveCharacter(character: Character): AppUpdate {
   }
 }
 
+export const SAVE_ENCOUNTER_INIT = 'SAVE_ENCOUNTER_INIT';
+
+function saveEncounterInit(): any {
+  return {
+    type: SAVE_ENCOUNTER_INIT
+  };
+}
+
+export const SAVE_ENCOUNTER_FINISH = 'SAVE_ENCOUNTER_FINISH';
+
+function saveEncounterFinish(response: any): any {
+  let encounter = JSON.parse(response.target.responseText);
+  encounter.roster = []; // FIXME
+  return {
+    type: SAVE_ENCOUNTER_FINISH,
+    encounter
+  };
+}
+
+export function saveEncounter(encounter: Encounter): AppUpdate {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    dispatch(saveEncounterInit());
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.addEventListener('loadend', (response) => {
+      dispatch(saveEncounterFinish(response));
+    });
+    xhr.open('POST', `http://localhost:8000/api/encounter/`);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(encounter));
+  }
+}
+
 export function querySpells(query: string): AppUpdate {
   const getSpells: AppUpdate = (dispatch: Dispatch, getState: () => AppState) => {
     dispatch(spellQueryRequest());
@@ -74,4 +108,29 @@ export function querySpells(query: string): AppUpdate {
     xhr.send();
   }
   return getSpells;
+}
+
+
+/* ENCOUNTER STATE LOAD */
+
+export const ENCOUNTER_STATE_LOAD = 'ENCOUNTER_STATE_LOAD';
+
+function encounterStateLoad(response: any): any {
+  let encounters = JSON.parse(response.target.responseText);
+
+  return {
+    type: ENCOUNTER_STATE_LOAD,
+    encounters: encounters
+  };
+}
+
+export function retrieveEncounterData(): AppUpdate {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.addEventListener('loadend', (response) => {
+      dispatch(encounterStateLoad(response));
+    });
+    xhr.open('GET', `http://localhost:8000/api/encounter`);
+    xhr.send();
+  }
 }

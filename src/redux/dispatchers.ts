@@ -1,5 +1,5 @@
-import { querySpells, saveCharacter, changeTool } from './actions';
-import { AppState, Character, ToolChoice } from '../interfaces';
+import { querySpells, saveCharacter, changeTool, saveEncounter } from './actions';
+import { AppState, Character, ToolChoice, Encounter } from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState
@@ -27,4 +27,12 @@ export function toolDispatch(dispatch: Dispatch): any {
       dispatch(changeTool(tool));
     }
   };
+}
+
+export function encounterDispatch(dispatch: Dispatch): any {
+  return {
+    saveEncounter: (encounter: Encounter) => {
+      dispatch(saveEncounter(encounter));
+    }
+  }
 }

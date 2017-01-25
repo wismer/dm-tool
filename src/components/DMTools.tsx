@@ -22,8 +22,7 @@ const DMToolsContainer = function(props: ToolChoiceProp) {
     content = <SpellList />;
   } else if (props.activeTool === ToolChoice.Encounter) {
     content = (
-      <EncounterList>
-      </EncounterList>
+      <EncounterList />
     );
   } else {
     content = <div>intentionally left blank</div>;
@@ -32,15 +31,15 @@ const DMToolsContainer = function(props: ToolChoiceProp) {
   return (
     <div id='dm-tools'>
       <Grid fluid={true}>
-          <Col xs={2}>
-            <Panel>
-              <Nav bsStyle="pills" stacked activeKey={props.activeTool}>
-                <NavItem onSelect={() => props.changeTool(ToolChoice.Encounter)} eventKey={1}>Create Encounter</NavItem>
-                <NavItem onSelect={() => props.changeTool(ToolChoice.SpellLookup)} eventKey={2}>Lookup Spell</NavItem>
-                <NavItem onSelect={() => props.changeTool(ToolChoice.Other)} eventKey={3}>Other</NavItem>
-              </Nav>
-            </Panel>
-          </Col>
+        <Col xs={2}>
+          <Panel>
+            <Nav bsStyle="pills" stacked activeKey={props.activeTool}>
+              <NavItem onSelect={() => props.changeTool(ToolChoice.Encounter)} eventKey={1}>Create Encounter</NavItem>
+              <NavItem onSelect={() => props.changeTool(ToolChoice.SpellLookup)} eventKey={2}>Lookup Spell</NavItem>
+              <NavItem onSelect={() => props.changeTool(ToolChoice.Other)} eventKey={3}>Other</NavItem>
+            </Nav>
+          </Panel>
+        </Col>
 
         <Col xs={8}>
           <Panel>
