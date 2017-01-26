@@ -1,12 +1,29 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Character, AddCharacterState } from '../interfaces';
-import { Form, FormGroup, FormControl, Col, ControlLabel, Panel, Button, Glyphicon } from 'react-bootstrap';
-import { characterListDispatch } from '../redux/dispatchers';
+import {
+  Form,
+  FormGroup,
+  FormControl,
+  Col,
+  ControlLabel,
+  Panel,
+  Button,
+  Glyphicon,
+  ListGroup,
+  ListGroupItem
+} from 'react-bootstrap';
+import { addCharacterDispatch, characterListDispatch } from '../redux/dispatchers';
 import { characterList, addCharacterProps } from '../redux/reducers/tools';
 
-type ContainerProps = { characters: Array<Character> };
-type ContainerState = { open: boolean };
+interface SavedCharacter extends Character {
+  id: number;
+}
+type ContainerProps = {
+  characters: Array<SavedCharacter>,
+  addCharactersToEncounter: (characterIDs: number[]) => void;
+};
+type ContainerState = { open: boolean, selectedCharacters: number[] };
 interface CharacterProps {
   saveCharacter: (character: Character) => void;
   isOpen: boolean;
@@ -146,28 +163,55 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
   }
 }
 
-const AddCharacterModal = connect(addCharacterProps, characterListDispatch)(AddCharacterModalContainer);
+const AddCharacterModal = connect(addCharacterProps, addCharacterDispatch)(AddCharacterModalContainer);
 
 class CharacterListContainer extends React.Component<ContainerProps, ContainerState> {
   constructor(props: ContainerProps) {
     super(props);
-    this.state = { open: false };
+    this.state = { open: false, selectedCharacters: [] };
+    this.selectCharacter = this.selectCharacter.bind(this);
+    this.saveCharactersToEncounter = this.saveCharactersToEncounter.bind(this);
+  }
+
+  saveCharactersToEncounter() {
+    const { selectedCharacters, open } = this.state;
+    this.props.addCharactersToEncounter(selectedCharacters);
+    this.setState({ selectedCharacters: [], open });
+  }
+
+  selectCharacter(id: number) {
+    let { selectedCharacters, open } = this.state;
+    if (selectedCharacters.indexOf(id) > -1) {
+      selectedCharacters = selectedCharacters.filter(char => char !== id);
+    } else {
+      selectedCharacters.push(id);
+    }
+
+    this.setState({ open, selectedCharacters });
   }
 
   render() {
-    const list = this.props.characters.map((c: Character, i: number) => {
+    const { selectedCharacters } = this.state;
+    const list = this.props.characters.map((c: SavedCharacter, i: number) => {
+      const isActive = selectedCharacters.indexOf(c.id) > -1;
       return (
-        <div key ={i} className='character'>
+        <ListGroupItem onClick={() => this.selectCharacter(c.id)} active={isActive} key={i} className='character'>
           {c.playerName} ({c.characterName})
-        </div>
+        </ListGroupItem>
       );
     })
     return (
       <div className='character-list'>
         <Panel header='Characters In Encounter'>
-          {list}
-          <Button bsStyle='success' block onClick={() => this.setState({ open: !this.state.open })}>
+          <ListGroup>
+            {list}
+          </ListGroup>
+          <Button bsStyle='success' block onClick={() => this.setState({ open: !this.state.open, selectedCharacters: this.state.selectedCharacters })}>
             Add Character
+          </Button>
+
+          <Button bsStyle='success' block onClick={this.saveCharactersToEncounter}>
+            Add Selected to current Encounter
           </Button>
         </Panel>
 
@@ -179,4 +223,4 @@ class CharacterListContainer extends React.Component<ContainerProps, ContainerSt
   }
 }
 
-export const CharacterList = connect(characterList)(CharacterListContainer);
+export const CharacterList = connect(characterList, characterListDispatch)(CharacterListContainer);

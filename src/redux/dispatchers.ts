@@ -1,4 +1,11 @@
-import { querySpells, saveCharacter, changeTool, saveEncounter, switchActiveEncounter } from './actions';
+import {
+  querySpells,
+  saveCharacter,
+  changeTool,
+  saveEncounter,
+  switchActiveEncounter,
+  addCharactersToEncounter
+} from './actions';
 import { AppState, Character, ToolChoice, Encounter } from '../interfaces';
 
 interface Dispatch {
@@ -13,12 +20,20 @@ export function spellListDispatchers(dispatch: Dispatch): any {
   };
 }
 
-export function characterListDispatch(dispatch: Dispatch): any {
+export function addCharacterDispatch(dispatch: Dispatch): any {
   return {
-    saveCharacter: (character: Character) => {
+    saveCharacter: (character: Character): void => {
       dispatch(saveCharacter(character));
     }
   }
+}
+
+export function characterListDispatch(dispatch: Dispatch): any {
+  return {
+    addCharactersToEncounter: (characterIDs: number[]): void => {
+      dispatch(addCharactersToEncounter(characterIDs));
+    }
+  };
 }
 
 export function toolDispatch(dispatch: Dispatch): any {

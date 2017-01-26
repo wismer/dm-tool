@@ -97,6 +97,24 @@ export function saveEncounter(encounter: Encounter): AppUpdate {
   }
 }
 
+export function addCharactersToEncounter(characterIDs: number[]): AppUpdate {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    const { tools } = getState();
+    if (tools.activeEncounter) {
+      let xhr: XMLHttpRequest = new XMLHttpRequest();
+      xhr.addEventListener('loadend', (response) => {
+        dispatch(encounterStateLoad(response));
+      });
+      // probably should just be a PATCH.
+      xhr.open('PATCH', `http://localhost:8000/api/encounter/${tools.activeEncounter}/characters/`);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify({ characters: characterIDs }));
+    } else {
+      // TODO add error handling if no activeEncounter
+    }
+  }
+}
+
 export function querySpells(query: string): AppUpdate {
   const getSpells: AppUpdate = (dispatch: Dispatch, getState: () => AppState) => {
     dispatch(spellQueryRequest());
@@ -116,7 +134,7 @@ export function querySpells(query: string): AppUpdate {
 export const ENCOUNTER_STATE_LOAD = 'ENCOUNTER_STATE_LOAD';
 
 function encounterStateLoad(response: any): any {
-  let { encounters, characters} = JSON.parse(response.target.responseText);
+  let { encounters, characters } = JSON.parse(response.target.responseText);
   return {
     type: ENCOUNTER_STATE_LOAD,
     encounters,

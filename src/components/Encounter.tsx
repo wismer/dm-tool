@@ -47,15 +47,9 @@ ENCOUNTER
   <Encounter />
 */
 
-function CharacterEncounterItem(props: CharacterState) {
-  return (
-    <ListGroupItem>
-      {props.playerName} ({props.characterName})
-    </ListGroupItem>
-  );
-}
-
-type Enc = { saveEncounter: (encounter: Encounter) => void };
+type Enc = {
+  saveEncounter: (encounter: Encounter) => void;
+};
 
 class CreateEncounterContainer extends React.Component<Enc, Encounter> {
   constructor() {
@@ -80,7 +74,9 @@ class CreateEncounterContainer extends React.Component<Enc, Encounter> {
   render() {
     const roster = this.state.roster.map((p: CharacterState, i: number) => {
       return (
-        <CharacterEncounterItem key={i} {...p} />
+        <ListGroupItem key={i}>
+          {p.playerName} ({p.characterName})
+        </ListGroupItem>
       );
     });
 
@@ -114,9 +110,33 @@ class CreateEncounterContainer extends React.Component<Enc, Encounter> {
   }
 }
 
+
+// FIXME yea yea I know this doesn't belong here.
+interface EncounterDispatch {
+  switchActiveEncounter: (key: number) => void;
+}
+
 const CreateEncounter = connect(() => ({}), encounterDispatch)(CreateEncounterContainer);
+
+function CharacterStateItem(props: CharacterState) {
+  return (
+    <ListGroupItem>
+      player: {props.playerName} | character name: {props.characterName} | HP: {props.currentHitPoints}
+    </ListGroupItem>
+  );
+}
+
+
+function EncounterItem(props: { encounter: Encounter }) {
+  const { encounter } = props;
+  const characters = encounter.roster.map((r: CharacterState, i: number) => {
+    return <CharacterStateItem {...r} key={i} />;
+  });
+  return <ListGroup>{characters}</ListGroup>;
+}
+
 type EncounterListState = { open?: boolean };
-class EncounterListContainer extends React.Component<EncounterListProps, EncounterListState> {
+class EncounterListContainer extends React.Component<EncounterListProps & EncounterDispatch, EncounterListState> {
   constructor(props: EncounterListProps) {
     super(props);
     this.state = { open: false };
@@ -130,7 +150,9 @@ class EncounterListContainer extends React.Component<EncounterListProps, Encount
   render() {
     const encounters = this.props.encounters.map((e: Encounter, i: number) => {
       return (
-        <Panel key={i} header={e.name} eventKey={e.id}>{e.roster.length}</Panel>
+        <Panel key={i} header={e.name} eventKey={e.id}>
+          <EncounterItem encounter={e} key={i} />
+        </Panel>
       );
     });
     return (

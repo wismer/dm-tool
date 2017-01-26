@@ -92,10 +92,11 @@ export interface Encounter {
   created?: Date
 }
 
+
+
 export interface EncounterListProps {
   encounters: Array<Encounter>;
   activeEncounter: null | number;
-  switchActiveEncounter: (id: number) => void;
 }
 
 export interface ToolState {
