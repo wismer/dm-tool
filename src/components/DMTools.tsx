@@ -41,13 +41,13 @@ const DMToolsContainer = function(props: ToolChoiceProp) {
           </Panel>
         </Col>
 
-        <Col xs={8}>
+        <Col xs={6}>
           <Panel>
             {content}
           </Panel>
         </Col>
 
-        <Col xs={2}>
+        <Col xs={4}>
           <CharacterList />
         </Col>
       </Grid>

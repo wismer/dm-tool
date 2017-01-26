@@ -11,7 +11,8 @@ import {
   Button,
   Glyphicon,
   ListGroup,
-  ListGroupItem
+  ListGroupItem,
+  Checkbox
 } from 'react-bootstrap';
 import { addCharacterDispatch, characterListDispatch } from '../redux/dispatchers';
 import { characterList, addCharacterProps } from '../redux/reducers/tools';
@@ -154,6 +155,16 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
             <FormControl onChange={this.handleChange} value={character.maxHitPoints} type="text" placeholder="Hit Points" />
           </Col>
         </FormGroup>
+
+        <FormGroup controlId='isNpc'>
+          <Col componentClass={ControlLabel} sm={4}>
+            NPC?
+          </Col>
+          <Col sm={8}>
+            <Checkbox checked={character.isNpc} />
+          </Col>
+        </FormGroup>
+
 
         <Button bsStyle='success' onClick={() => this.props.saveCharacter(this.state.character)} block>
           <Glyphicon glyph='plus' />

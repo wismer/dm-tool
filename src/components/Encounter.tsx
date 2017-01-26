@@ -12,6 +12,7 @@ import {
   PanelGroup,
   Col,
   Button,
+  Checkbox,
   ControlLabel
 } from 'react-bootstrap';
 import { encounterListProps } from '../redux/reducers/tools';
@@ -72,16 +73,7 @@ class CreateEncounterContainer extends React.Component<Enc, Encounter> {
   }
 
   render() {
-    const roster = this.state.roster.map((p: CharacterState, i: number) => {
-      return (
-        <ListGroupItem key={i}>
-          {p.playerName} ({p.characterName})
-        </ListGroupItem>
-      );
-    });
-
-    const { name } = this.state;
-
+    const { name, surpriseRound } = this.state;
 
     return (
       <Form horizontal>
@@ -93,13 +85,12 @@ class CreateEncounterContainer extends React.Component<Enc, Encounter> {
             <FormControl onChange={this.handleChange} value={name} type="text" placeholder="Name for Encounter" />
           </Col>
         </FormGroup>
-        <FormGroup controlId='roster'>
+        <FormGroup controlId='surpriseRound'>
           <Col componentClass={ControlLabel} sm={4}>
-            Characters's Name
+            Surprise Round?
           </Col>
-
           <Col sm={8}>
-            <ListGroup>{roster}</ListGroup>
+            <Checkbox checked={surpriseRound} />
           </Col>
         </FormGroup>
         <Button bsStyle='success' onClick={() => this.props.saveEncounter(this.state)} block>
@@ -156,23 +147,17 @@ class EncounterListContainer extends React.Component<EncounterListProps & Encoun
       );
     });
     return (
-      <div>
-        <Col xs={8}>
-          <Button block onClick={() => this.setState({ open: !this.state.open })}>
-            Create Encounter
-          </Button>
-          <Panel collapsible expanded={this.state.open}>
-            <CreateEncounter />
-          </Panel>
-          <PanelGroup activeKey={this.props.activeEncounter} accordion onSelect={this.handleSelect}>
-            {encounters}
-          </PanelGroup>
-        </Col>
-
-        <Col xs={4}>
-          {this.props.children}
-        </Col>
-      </div>
+      <Col xs={12}>
+        <Button block onClick={() => this.setState({ open: !this.state.open })}>
+          Create Encounter
+        </Button>
+        <Panel collapsible expanded={this.state.open}>
+          <CreateEncounter />
+        </Panel>
+        <PanelGroup activeKey={this.props.activeEncounter} accordion onSelect={this.handleSelect}>
+          {encounters}
+        </PanelGroup>
+      </Col>
     );
   }
 }
