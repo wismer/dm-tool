@@ -17,6 +17,7 @@ function AppContainer() {
         <Route path='/' component={App}>
           <Route path='/dm-tools' component={DMTools} onEnter={() => {
             store.dispatch(retrieveEncounterData());
+            // yea yea this is probably not the best way to load state from the server.
           }} />
         </Route>
       </Router>

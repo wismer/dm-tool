@@ -12,6 +12,7 @@ import {
   SAVE_ENCOUNTER_INIT,
   SAVE_ENCOUNTER_FINISH,
   ENCOUNTER_STATE_LOAD,
+  SWITCH_ACTIVE_ENCOUNTER,
   CHANGE_TOOL
 } from '../actions';
 import { Character } from '../../interfaces';
@@ -27,6 +28,7 @@ const initialState: ToolState = {
   turnOrder: initialTool,
   activeTool: 1,
   encounters: [],
+  characters: [],
   activeEncounter: null
 };
 
@@ -50,9 +52,16 @@ function addEncounter(state: ToolState, encounter: Encounter) {
   });
 }
 
-function loadEncounters(state: ToolState, encounters: Encounter[]): ToolState {
+function loadEncounters(state: ToolState, action: { encounters: Encounter[], characters: Character[] }): ToolState {
   return Object.assign({}, state, {
-    encounters: encounters
+    encounters: action.encounters,
+    characters: action.characters
+  });
+}
+
+function switchActiveEncounter(state: ToolState, id: number | null): ToolState {
+  return Object.assign({}, state, {
+    activeEncounter: id
   });
 }
 
@@ -66,17 +75,22 @@ export function tools(state: ToolState, action: any): ToolState {
       return addCharacterToList(state, action.character);
     case CHANGE_TOOL:
       return changeTool(state, action.tool);
-    case SAVE_ENCOUNTER_INIT: return state;
+    case SAVE_ENCOUNTER_INIT:
+      return state; // TODO
     case SAVE_ENCOUNTER_FINISH:
       return addEncounter(state, action.encounter);
     case ENCOUNTER_STATE_LOAD:
-      return loadEncounters(state, action.encounters);
+      return loadEncounters(state, action);
+    case SWITCH_ACTIVE_ENCOUNTER:
+      return switchActiveEncounter(state, action.id);
     default: return state;
   }
 }
+
 type ListState = { characters: Array<Character> };
+
 export function characterList(state: AppState, props: any): ListState {
-  return { characters: state.tools.turnOrder.players };
+  return { characters: state.tools.characters };
 }
 
 export function addCharacterProps(state: AppState, props: any): {isOpen: boolean} {
@@ -89,6 +103,6 @@ export function encounterListProps(state: AppState, props: any): EncounterListPr
   const { tools } = state;
   return {
     encounters: tools.encounters,
-    activeEncounter: tools.activeEncounter || 1
+    activeEncounter: tools.activeEncounter
   };
 }

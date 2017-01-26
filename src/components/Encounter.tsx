@@ -15,7 +15,7 @@ import {
   ControlLabel
 } from 'react-bootstrap';
 import { encounterListProps } from '../redux/reducers/tools';
-import { encounterDispatch } from '../redux/dispatchers';
+import { encounterDispatch, encounterListDispatch } from '../redux/dispatchers';
 /*
 ENCOUNTER
   name - text
@@ -115,11 +115,16 @@ class CreateEncounterContainer extends React.Component<Enc, Encounter> {
 }
 
 const CreateEncounter = connect(() => ({}), encounterDispatch)(CreateEncounterContainer);
-
-class EncounterListContainer extends React.Component<EncounterListProps, {open: boolean}> {
+type EncounterListState = { open?: boolean };
+class EncounterListContainer extends React.Component<EncounterListProps, EncounterListState> {
   constructor(props: EncounterListProps) {
     super(props);
     this.state = { open: false };
+    this.handleSelect = this.handleSelect.bind(this);
+  }
+
+  handleSelect(key: any) {
+    this.props.switchActiveEncounter(key);
   }
 
   render() {
@@ -137,7 +142,7 @@ class EncounterListContainer extends React.Component<EncounterListProps, {open: 
           <Panel collapsible expanded={this.state.open}>
             <CreateEncounter />
           </Panel>
-          <PanelGroup activeKey={this.props.activeEncounter}>
+          <PanelGroup activeKey={this.props.activeEncounter} accordion onSelect={this.handleSelect}>
             {encounters}
           </PanelGroup>
         </Col>
@@ -150,5 +155,5 @@ class EncounterListContainer extends React.Component<EncounterListProps, {open: 
   }
 }
 
-const EncounterList = connect(encounterListProps)(EncounterListContainer);
+const EncounterList = connect(encounterListProps, encounterListDispatch)(EncounterListContainer);
 export default EncounterList;

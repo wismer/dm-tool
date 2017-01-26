@@ -95,11 +95,13 @@ export interface Encounter {
 export interface EncounterListProps {
   encounters: Array<Encounter>;
   activeEncounter: null | number;
+  switchActiveEncounter: (id: number) => void;
 }
 
 export interface ToolState {
   turnOrder: TurnOrder;
   encounters: Array<Encounter>;
+  characters: Array<Character>;
   activeEncounter: null | number;
   activeTool: ToolChoice;
 }

@@ -116,11 +116,11 @@ export function querySpells(query: string): AppUpdate {
 export const ENCOUNTER_STATE_LOAD = 'ENCOUNTER_STATE_LOAD';
 
 function encounterStateLoad(response: any): any {
-  let encounters = JSON.parse(response.target.responseText);
-
+  let { encounters, characters} = JSON.parse(response.target.responseText);
   return {
     type: ENCOUNTER_STATE_LOAD,
-    encounters: encounters
+    encounters,
+    characters
   };
 }
 
@@ -133,4 +133,13 @@ export function retrieveEncounterData(): AppUpdate {
     xhr.open('GET', `http://localhost:8000/api/encounter`);
     xhr.send();
   }
+}
+
+export const SWITCH_ACTIVE_ENCOUNTER = 'SWITCH_ACTIVE_ENCOUNTER';
+
+export function switchActiveEncounter(id: number | null): any {
+  return {
+    type: SWITCH_ACTIVE_ENCOUNTER,
+    id
+  };
 }

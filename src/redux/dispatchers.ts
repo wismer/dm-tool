@@ -1,4 +1,4 @@
-import { querySpells, saveCharacter, changeTool, saveEncounter } from './actions';
+import { querySpells, saveCharacter, changeTool, saveEncounter, switchActiveEncounter } from './actions';
 import { AppState, Character, ToolChoice, Encounter } from '../interfaces';
 
 interface Dispatch {
@@ -33,6 +33,14 @@ export function encounterDispatch(dispatch: Dispatch): any {
   return {
     saveEncounter: (encounter: Encounter) => {
       dispatch(saveEncounter(encounter));
+    }
+  }
+}
+
+export function encounterListDispatch(dispatch: Dispatch): any {
+  return {
+    switchActiveEncounter: (id: number | null) => {
+      dispatch(switchActiveEncounter(id));
     }
   }
 }
