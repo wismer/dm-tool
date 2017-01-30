@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import * as React from 'react';
 import SpellList from './SpellList';
 import { CharacterList } from './CharacterList';
-import EncounterList from './Encounter';
+import EncounterList from './EncounterList';
 import { Nav, NavItem, Col, Grid, Panel } from 'react-bootstrap';
 import { toolDispatch } from '../redux/dispatchers';
 

@@ -84,6 +84,29 @@ function saveEncounterFinish(response: any): any {
   };
 }
 
+export const SAVE_CHARACTER = 'SAVE_CHARACTER';
+
+function saveCharacterFinish(response: any): any {
+  let character = JSON.parse(response.target.responseText);
+  return {
+    type: SAVE_CHARACTER,
+    character
+  };
+}
+
+export function addCharacter(character: Character): AppUpdate {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.addEventListener('loadend', (response) => {
+      dispatch(saveCharacterFinish(response));
+    });
+    xhr.open('POST', `http://localhost:8000/api/character/`);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(character));
+
+  };
+}
+
 export function saveEncounter(encounter: Encounter): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
     dispatch(saveEncounterInit());
@@ -94,7 +117,7 @@ export function saveEncounter(encounter: Encounter): AppUpdate {
     xhr.open('POST', `http://localhost:8000/api/encounter/`);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(encounter));
-  }
+  };
 }
 
 export function addCharactersToEncounter(characterIDs: number[]): AppUpdate {

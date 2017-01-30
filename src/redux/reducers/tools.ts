@@ -12,6 +12,7 @@ import {
   SAVE_ENCOUNTER_INIT,
   SAVE_ENCOUNTER_FINISH,
   ENCOUNTER_STATE_LOAD,
+  SAVE_CHARACTER,
   SWITCH_ACTIVE_ENCOUNTER,
   CHANGE_TOOL
 } from '../actions';
@@ -65,6 +66,12 @@ function switchActiveEncounter(state: ToolState, id: number | null): ToolState {
   });
 }
 
+function saveCharacter(state: ToolState, character: Character): ToolState {
+  return Object.assign({}, state, {
+    characters: [...state.characters, character]
+  });
+}
+
 export function tools(state: ToolState, action: any): ToolState {
   if (!state) {
     return initialState;
@@ -83,6 +90,8 @@ export function tools(state: ToolState, action: any): ToolState {
       return loadEncounters(state, action);
     case SWITCH_ACTIVE_ENCOUNTER:
       return switchActiveEncounter(state, action.id);
+    case SAVE_CHARACTER:
+      return saveCharacter(state, action.character);
     default: return state;
   }
 }

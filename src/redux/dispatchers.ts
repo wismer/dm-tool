@@ -1,6 +1,6 @@
 import {
   querySpells,
-  saveCharacter,
+  addCharacter,
   changeTool,
   saveEncounter,
   switchActiveEncounter,
@@ -23,7 +23,7 @@ export function spellListDispatchers(dispatch: Dispatch): any {
 export function addCharacterDispatch(dispatch: Dispatch): any {
   return {
     saveCharacter: (character: Character): void => {
-      dispatch(saveCharacter(character));
+      dispatch(addCharacter(character));
     }
   }
 }

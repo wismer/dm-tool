@@ -74,8 +74,13 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
 
   handleChange(e: any) {
     const character = this.state.character;
-    character[e.target.id] = e.target.value;
-    this.setState({ character });
+    if (e.target.id === 'isNpc') {
+      character.isNpc = !character.isNpc;
+      this.setState({ character });
+    } else {
+      character[e.target.id] = e.target.value;
+      this.setState({ character });
+    }
   }
 
   render() {
@@ -138,7 +143,7 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
 
         <FormGroup controlId='currentHitPoints'>
           <Col componentClass={ControlLabel} sm={4}>
-            Hit Points (HP)
+            Current Hit Points
           </Col>
 
           <Col sm={4}>
@@ -148,7 +153,7 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
 
         <FormGroup controlId='maxHitPoints'>
           <Col componentClass={ControlLabel} sm={4}>
-            Hit Points (HP)
+            Max Hit Points (HP)
           </Col>
 
           <Col sm={4}>
@@ -160,11 +165,11 @@ class AddCharacterModalContainer extends React.Component<CharacterProps, AddChar
           <Col componentClass={ControlLabel} sm={4}>
             NPC?
           </Col>
+
           <Col sm={8}>
-            <Checkbox checked={character.isNpc} />
+            <Checkbox onChange={this.handleChange} inline id='isNpc' />
           </Col>
         </FormGroup>
-
 
         <Button bsStyle='success' onClick={() => this.props.saveCharacter(this.state.character)} block>
           <Glyphicon glyph='plus' />
@@ -205,9 +210,10 @@ class CharacterListContainer extends React.Component<ContainerProps, ContainerSt
     const { selectedCharacters } = this.state;
     const list = this.props.characters.map((c: SavedCharacter, i: number) => {
       const isActive = selectedCharacters.indexOf(c.id) > -1;
+      const title = c.isNpc ? '' : `(${c.characterName})`;
       return (
         <ListGroupItem onClick={() => this.selectCharacter(c.id)} active={isActive} key={i} className='character'>
-          {c.playerName} ({c.characterName})
+          {c.playerName} {title}
         </ListGroupItem>
       );
     })
@@ -217,6 +223,7 @@ class CharacterListContainer extends React.Component<ContainerProps, ContainerSt
           <ListGroup>
             {list}
           </ListGroup>
+
           <Button bsStyle='success' block onClick={() => this.setState({ open: !this.state.open, selectedCharacters: this.state.selectedCharacters })}>
             Add Character
           </Button>
