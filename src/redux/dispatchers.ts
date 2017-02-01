@@ -4,9 +4,10 @@ import {
   changeTool,
   saveEncounter,
   switchActiveEncounter,
-  addCharactersToEncounter
+  addCharactersToEncounter,
+  updateEncounter
 } from './actions';
-import { AppState, Character, ToolChoice, Encounter } from '../interfaces';
+import { AppState, Character, ToolChoice, SavedCharacter } from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState
@@ -30,8 +31,8 @@ export function addCharacterDispatch(dispatch: Dispatch): any {
 
 export function characterListDispatch(dispatch: Dispatch): any {
   return {
-    addCharactersToEncounter: (characterIDs: number[]): void => {
-      dispatch(addCharactersToEncounter(characterIDs));
+    addCharactersToEncounter: (characters: SavedCharacter[]): void => {
+      dispatch(addCharactersToEncounter(characters));
     }
   };
 }
@@ -46,8 +47,12 @@ export function toolDispatch(dispatch: Dispatch): any {
 
 export function encounterDispatch(dispatch: Dispatch): any {
   return {
-    saveEncounter: (encounter: Encounter) => {
-      dispatch(saveEncounter(encounter));
+    saveEncounter: () => {
+      dispatch(saveEncounter());
+    },
+
+    updateEncounter: (key: string, data: any) => {
+      dispatch(updateEncounter(key, data));
     }
   }
 }

@@ -1,4 +1,10 @@
-import { AppState, Character, ToolChoice, Encounter } from '../interfaces';
+import {
+  AppState,
+  SavedCharacter,
+  Character,
+  ToolChoice,
+  CharDesc
+} from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState;
@@ -107,8 +113,16 @@ export function addCharacter(character: Character): AppUpdate {
   };
 }
 
-export function saveEncounter(encounter: Encounter): AppUpdate {
+export function saveEncounter(): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
+    const { tools } = getState();
+    const { enemies, players, name, surpriseRound } = tools.createEncounter;
+    const roster = enemies.concat(players).map(c => ({id: c.id, count: c.count || 1, intiativeRoll: c.initiativeRoll}))
+    let encounter = {
+      roster,
+      name,
+      surpriseRound
+    };
     dispatch(saveEncounterInit());
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', (response) => {
@@ -120,23 +134,58 @@ export function saveEncounter(encounter: Encounter): AppUpdate {
   };
 }
 
-export function addCharactersToEncounter(characterIDs: number[]): AppUpdate {
-  return (dispatch: Dispatch, getState: () => AppState) => {
-    const { tools } = getState();
-    if (tools.activeEncounter) {
-      let xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.addEventListener('loadend', (response) => {
-        dispatch(encounterStateLoad(response));
-      });
-      // probably should just be a PATCH.
-      xhr.open('PATCH', `http://localhost:8000/api/encounter/${tools.activeEncounter}/characters/`);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(JSON.stringify({ characters: characterIDs }));
-    } else {
-      // TODO add error handling if no activeEncounter
-    }
+export const ADD_CHARS_TO_NEW_ENCOUNTER = 'ADD_CHARS_TO_NEW_ENCOUNTER';
+
+export function addCharactersToEncounter(characters: SavedCharacter[]): any {
+  return {
+    type: ADD_CHARS_TO_NEW_ENCOUNTER,
+    players: characters.filter(c => !c.isNpc),
+    enemies: characters.filter(c => c.isNpc)
+  };
+}
+
+export const UPDATE_INITIATIVE_SCORE = 'UPDATE_INITIATIVE_SCORE';
+
+
+function updateInitiativeScore(c: CharDesc, score: number): any {
+  return {
+    type: UPDATE_INITIATIVE_SCORE,
+    character: c,
+    score
+  };
+}
+
+export function updateEncounter(key: string, data: any): any {
+  if (key === 'init') {
+    return updateInitiativeScore(data.c, data.v);
+  } else {
+    return {
+      type: 'UPDATE_ENCOUNTER',
+      key,
+      value: data.v
+    };
   }
 }
+
+
+/*
+// return (dispatch: Dispatch, getState: () => AppState) => {
+//   const { tools } = getState();
+//   if (tools.activeEncounter) {
+//     let xhr: XMLHttpRequest = new XMLHttpRequest();
+//     xhr.addEventListener('loadend', (response) => {
+//       dispatch(encounterStateLoad(response));
+//     });
+//     // probably should just be a PATCH.
+//     xhr.open('PATCH', `http://localhost:8000/api/encounter/${tools.activeEncounter}/characters/`);
+//     xhr.setRequestHeader('Content-Type', 'application/json');
+//     xhr.send(JSON.stringify({ characters: characterIDs }));
+//   } else {
+//     // TODO add error handling if no activeEncounter
+//   }
+// }
+
+*/
 
 export function querySpells(query: string): AppUpdate {
   const getSpells: AppUpdate = (dispatch: Dispatch, getState: () => AppState) => {
@@ -161,7 +210,10 @@ function encounterStateLoad(response: any): any {
   return {
     type: ENCOUNTER_STATE_LOAD,
     encounters,
-    characters
+    characters: characters.map((char: SavedCharacter) => {
+      char.count = 1;
+      return char;
+    })
   };
 }
 

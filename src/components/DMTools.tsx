@@ -6,6 +6,7 @@ import { CharacterList } from './CharacterList';
 import EncounterList from './EncounterList';
 import { Nav, NavItem, Col, Grid, Panel } from 'react-bootstrap';
 import { toolDispatch } from '../redux/dispatchers';
+import { withRouter } from 'react-router';
 
 function toolProps(state: AppState): ToolState {
   return state.tools;
@@ -16,6 +17,7 @@ interface ToolChoiceProp extends ToolState {
 }
 
 const DMToolsContainer = function(props: ToolChoiceProp) {
+  debugger
   let content;
 
   if (props.activeTool === ToolChoice.SpellLookup) {
@@ -55,6 +57,6 @@ const DMToolsContainer = function(props: ToolChoiceProp) {
   );
 }
 
-const DMTools = connect(toolProps, toolDispatch)(DMToolsContainer);
+const DMTools = withRouter(connect(toolProps, toolDispatch)(DMToolsContainer));
 
 export default DMTools;

@@ -19,6 +19,7 @@ function AppContainer() {
             store.dispatch(retrieveEncounterData());
             // yea yea this is probably not the best way to load state from the server.
           }}>
+            <Route path='/dm-tools/:id/' />
           </Route>
         </Route>
       </Router>

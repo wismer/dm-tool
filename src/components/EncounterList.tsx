@@ -14,10 +14,11 @@ import {
   Col,
   Button,
   Checkbox,
-  ControlLabel
+  ControlLabel,
 } from 'react-bootstrap';
+import CreateEncounter from './CreateEncounter';
 import { encounterListProps } from '../redux/reducers/tools';
-import { encounterDispatch, encounterListDispatch } from '../redux/dispatchers';
+import { encounterListDispatch } from '../redux/dispatchers';
 /*
 ENCOUNTER
   name - text
@@ -53,7 +54,7 @@ type Enc = {
   saveEncounter: (encounter: Encounter) => void;
 };
 
-class CreateEncounterContainer extends React.Component<Enc, Encounter> {
+export class CreateEncounterContainer extends React.Component<Enc, Encounter> {
   constructor() {
     super();
     this.state = {
@@ -75,7 +76,6 @@ class CreateEncounterContainer extends React.Component<Enc, Encounter> {
 
   render() {
     const { name, surpriseRound } = this.state;
-
     return (
       <Form horizontal>
         <FormGroup controlId='encounterName'>
@@ -107,8 +107,6 @@ class CreateEncounterContainer extends React.Component<Enc, Encounter> {
 interface EncounterDispatch {
   switchActiveEncounter: (key: number) => void;
 }
-
-const CreateEncounter = connect(() => ({}), encounterDispatch)(CreateEncounterContainer);
 
 function CharacterStateItem(props: CharacterState) {
   return (
