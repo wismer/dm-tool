@@ -4,19 +4,29 @@ import {
   TurnOrder,
   AppState,
   EncounterListProps,
+  SavedCharacter,
   Encounter
  } from '../../interfaces';
 import {
   // INIT_SAVE_CHARACTER_DM_TOOL,
   FINISH_SAVE_CHARACTER_DM_TOOL,
-  SAVE_ENCOUNTER_INIT,
+  LOAD_ENCOUNTERS_INIT,
   SAVE_ENCOUNTER_FINISH,
   ENCOUNTER_STATE_LOAD,
+  ENCOUNTER_DETAIL_LOAD,
   SAVE_CHARACTER,
+  SAVE_ENCOUNTER_INIT,
   SWITCH_ACTIVE_ENCOUNTER,
-  CHANGE_TOOL
+  END_ROUND_FINISH,
+  END_ROUND_INIT,
+  CHANGE_TOOL,
+  CHARACTER_LIST_LOAD,
+  UPDATE_HIT_POINTS,
 } from '../actions';
-import { Character } from '../../interfaces';
+import {
+  CharacterMap
+} from '../../util';
+import { Character, EncounterCreationProps } from '../../interfaces';
 
 const initialTool: TurnOrder = {
   players: [],
@@ -27,6 +37,7 @@ const initialTool: TurnOrder = {
 
 const initialState: ToolState = {
   turnOrder: initialTool,
+  isLoading: false,
   activeTool: 1,
   encounters: [],
   characters: [],
@@ -40,7 +51,7 @@ function addCharacterToList(state: ToolState, character: any): ToolState {
     players: [...turnOrder.players, character],
   });
 
-  return Object.assign({}, state, { turnOrder })
+  return Object.assign({}, state, { turnOrder });
 }
 
 function changeTool(state: ToolState, tool: ToolChoice): ToolState {
@@ -56,7 +67,8 @@ function addEncounter(state: ToolState, encounter: Encounter) {
 function loadEncounters(state: ToolState, action: { encounters: Encounter[], characters: Character[] }): ToolState {
   return Object.assign({}, state, {
     encounters: action.encounters,
-    characters: action.characters
+    characters: action.characters,
+    isLoading: false
   });
 }
 
@@ -72,6 +84,59 @@ function saveCharacter(state: ToolState, character: Character): ToolState {
   });
 }
 
+
+
+function loadEncountersInit(state: ToolState): ToolState {
+  return Object.assign({}, state, { isLoading: true });
+}
+
+function loadEncounterDetail(state: ToolState, action: any): ToolState {
+  const { encounter } = action;
+  let encounters = state.encounters.filter(e => e.id !== encounter.id);
+  return Object.assign({}, state, { encounters: [...encounters, encounter], isLoading: false });
+}
+
+function characterListLoad(state: ToolState, characters: SavedCharacter[]): ToolState {
+  return Object.assign({}, state, { characters });
+}
+
+function updateEncounterRoster(roster: Character[], charID: number, hp: number): Character[] {
+  return roster.map(c => {
+    if (c.id === charID) {
+      c.currentHitPoints += hp;
+    }
+    return c;
+  });
+}
+
+function updateHitPoints(state: ToolState, charStateID: number, hp: number, encounterID: number) {
+  return Object.assign({}, state, {
+    encounters: state.encounters.map(e => {
+      if (e.id === encounterID) {
+        return Object.assign({}, e, { roster: updateEncounterRoster(e.roster, charStateID, hp) });
+      }
+
+      return e;
+    })
+  });
+}
+
+function endRoundInit(state: ToolState, id: number): ToolState {
+  return state;
+}
+
+function endRoundFinish(state: ToolState, action: any): ToolState {
+  return Object.assign({}, state, {
+    encounters: state.encounters.map(e => {
+      if (e.id === action.id) {
+        return action;
+      }
+      return e;
+    })
+  });
+}
+
+
 export function tools(state: ToolState, action: any): ToolState {
   if (!state) {
     return initialState;
@@ -82,24 +147,51 @@ export function tools(state: ToolState, action: any): ToolState {
       return addCharacterToList(state, action.character);
     case CHANGE_TOOL:
       return changeTool(state, action.tool);
+    case CHARACTER_LIST_LOAD:
+      return characterListLoad(state, action.characters);
     case SAVE_ENCOUNTER_INIT:
       return state; // TODO
     case SAVE_ENCOUNTER_FINISH:
       return addEncounter(state, action.encounter);
     case ENCOUNTER_STATE_LOAD:
       return loadEncounters(state, action);
+    case ENCOUNTER_DETAIL_LOAD:
+      return loadEncounterDetail(state, action);
+    case UPDATE_HIT_POINTS:
+      return updateHitPoints(state, action.charStateID, action.hp, action.encounterID);
     case SWITCH_ACTIVE_ENCOUNTER:
       return switchActiveEncounter(state, action.id);
     case SAVE_CHARACTER:
       return saveCharacter(state, action.character);
+    case LOAD_ENCOUNTERS_INIT:
+      return loadEncountersInit(state);
+    case END_ROUND_INIT:
+      return endRoundInit(state, action.id);
+    case END_ROUND_FINISH:
+      return endRoundFinish(state, action);
     default: return state;
   }
 }
 
-type ListState = { characters: Array<Character> };
-
-export function characterList(state: AppState, props: any): ListState {
-  return { characters: state.tools.characters };
+export function characterList(state: AppState, props: any): {characters: Array<SavedCharacter>, filter: string | null, activeIdx: number} {
+  if (props.characters) {
+    return { characters: props.characters, filter: props.filter, activeIdx: props.activeIdx };
+  }
+  switch (props.filter) {
+    case 'npcs':
+      return {
+        characters: state.tools.characters.filter(c => c.isNpc),
+        filter: props.filter,
+        activeIdx: props.activeIdx
+      };
+    case 'players':
+      return {
+        characters: state.tools.characters.filter(c => !c.isNpc),
+        filter: props.filter,
+        activeIdx: props.activeIdx
+      };
+    default: return { characters: state.tools.characters, filter: props.filter, activeIdx: props.activeIdx };
+  }
 }
 
 export function addCharacterProps(state: AppState, props: any): {isOpen: boolean} {
@@ -113,5 +205,22 @@ export function encounterListProps(state: AppState, props: any): EncounterListPr
   return {
     encounters: tools.encounters,
     activeEncounter: tools.activeEncounter
+  };
+}
+
+export function encounterViewProps(state: AppState, props: any): Encounter {
+  const { id } = props.params;
+  return state.tools.encounters.find(e => `${e.id}` === id) || state.tools.encounters[0]
+}
+
+export function createEncounterProps(state: AppState, props: any): EncounterCreationProps {
+  const { tools } = state;
+  const { players, npcs } = CharacterMap(tools.characters).split();
+  return {
+    children: props.children,
+    players,
+    npcs,
+    saveEncounter: props.saveEncounter,
+    onChange: props.onChange,
   };
 }

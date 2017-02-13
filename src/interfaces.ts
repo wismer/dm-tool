@@ -1,4 +1,3 @@
-
 export enum SpellComponent {
   Verbal = 1,
   Somatic = 2,
@@ -11,6 +10,10 @@ export enum ToolChoice {
   Other = 3
 }
 
+export interface IDPayload {
+  id: number;
+  count: number;
+}
 
 export interface Spell {
   id: number;
@@ -54,17 +57,34 @@ export interface Character {
   toHit?: number;
   passiveWisdom?: number;
   initiative?: number;
+  initiativeRoll?: number;
   conditions?: string[];
   currentHitPoints?: number;
   maxHitPoints: number;
   isNpc: boolean;
 }
 
+export interface CreateCharacterProps {
+  saveCharacter: (character: Character) => void;
+  isOpen: boolean;
+}
+
+export interface ContainerProps {
+  characters: Array<SavedCharacter>,
+  addCharactersToEncounter: (characters: CharDesc[]) => void;
+};
+
+export interface SavedCharacter extends Character {
+  id: number;
+  name: string;
+  count?: number;
+}
+
 export interface AddCharacter extends Character {
   [name: string]: number | string | null | string[] | boolean | undefined;
 }
 
-export interface AddCharacterState {
+export interface CreateCharacterState {
   open?: boolean;
   character: AddCharacter;
 }
@@ -84,15 +104,40 @@ export interface CharacterState extends Character {
 }
 
 export interface Encounter {
-  name: string;
-  roster: Array<CharacterState>;
+  name: string | null;
+  roster: Array<SavedCharacter | Character>;
   currentTurn: number;
   id: null | number;
   surpriseRound: boolean;
   created?: Date
 }
 
+export interface CharDesc {
+  playerName: string;
+  characterName: string;
+  isNpc: boolean;
+  count: number;
+  id: number;
+  initiativeRoll: null | number;
+  initiative: number;
+  wasSurprised: boolean;
+  children?: any;
+}
 
+export interface EncounterCreation {
+  surpriseRound: boolean;
+  currentTurn: number;
+  name: string;
+}
+
+export interface EncounterCreationProps {
+  npcs: Character[];
+  players: Character[];
+  saveEncounter: (encounter: Encounter) => void;
+  children?: any;
+  onCharSelect?: (char: Character, fromList: boolean) => void;
+  onChange: (field: string, value: number | string | boolean) => void;
+}
 
 export interface EncounterListProps {
   encounters: Array<Encounter>;
@@ -102,9 +147,10 @@ export interface EncounterListProps {
 export interface ToolState {
   turnOrder: TurnOrder;
   encounters: Array<Encounter>;
-  characters: Array<Character>;
+  characters: Array<SavedCharacter>;
   activeEncounter: null | number;
   activeTool: ToolChoice;
+  isLoading: boolean;
 }
 
 export interface Race {
@@ -133,4 +179,26 @@ export interface EncounterTool extends Tool {
   id: null | number;
   currentTurn: number;
   surpriseRound: boolean;
+}
+
+export enum MenuOptions {
+  None = 0,
+  Encounters = 1,
+  SpellLookup = 2,
+}
+
+type Condition = "prone" | "incapacitated" | "stunned" | "poisoned" | "defeaned" | "frightened" | "charmed" | "invisible" | "paralyzed" | "petrified" | "blinded"
+
+export interface CharacterStateUpdate {
+  id?: number | null;
+  characterstate?: number | null;
+  currentHitPoints: number;
+  readiedAction?: boolean;
+  conditions?: Condition[] | never[];
+}
+
+export interface EncounterUpdate {
+  id: number;
+  endOfRound: boolean;
+  roster: Array<CharacterStateUpdate>;
 }
