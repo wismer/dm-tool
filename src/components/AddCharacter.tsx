@@ -11,7 +11,8 @@ import {
   ControlLabel,
   Button,
   Glyphicon,
-  Checkbox
+  Checkbox,
+  Panel
 } from 'react-bootstrap';
 
 class AddCharacterContainer extends React.Component<CreateCharacterProps, CreateCharacterState> {
@@ -70,95 +71,97 @@ class AddCharacterContainer extends React.Component<CreateCharacterProps, Create
   render() {
     const { character } = this.state;
     return (
-      <Form horizontal>
-        <FormGroup controlId='playerName'>
-          <Col componentClass={ControlLabel} sm={4}>
-            Player's Name
-          </Col>
-          <Col sm={8}>
-            <FormControl onChange={this.handleChange} value={character.playerName} type="text" placeholder="Player's Name" />
-          </Col>
-        </FormGroup>
-        <FormGroup controlId='characterName'>
-          <Col componentClass={ControlLabel} sm={4}>
-            Characters's Name
-          </Col>
+      <Panel header='Create Character'>
+        <Form horizontal>
+          <FormGroup controlId='playerName'>
+            <Col componentClass={ControlLabel} sm={4}>
+              Player's Name
+            </Col>
+            <Col sm={8}>
+              <FormControl onChange={this.handleChange} value={character.playerName} type="text" placeholder="Player's Name" />
+            </Col>
+          </FormGroup>
+          <FormGroup controlId='characterName'>
+            <Col componentClass={ControlLabel} sm={4}>
+              Characters's Name
+            </Col>
 
-          <Col sm={8}>
-            <FormControl onChange={this.handleChange} value={character.characterName} type="text" placeholder="Characters Name" />
-          </Col>
-        </FormGroup>
-        <FormGroup controlId='armorClass'>
-          <Col componentClass={ControlLabel} sm={4}>
-            AC
-          </Col>
+            <Col sm={8}>
+              <FormControl onChange={this.handleChange} value={character.characterName} type="text" placeholder="Characters Name" />
+            </Col>
+          </FormGroup>
+          <FormGroup controlId='armorClass'>
+            <Col componentClass={ControlLabel} sm={4}>
+              AC
+            </Col>
 
-          <Col sm={4}>
-            <FormControl onChange={this.handleChange} value={character.armorClass} type="number" placeholder="AC" />
-          </Col>
-        </FormGroup>
-        <FormGroup controlId='toHit'>
-          <Col componentClass={ControlLabel} sm={4}>
-            To Hit
-          </Col>
+            <Col sm={4}>
+              <FormControl onChange={this.handleChange} value={character.armorClass} type="number" placeholder="AC" />
+            </Col>
+          </FormGroup>
+          <FormGroup controlId='toHit'>
+            <Col componentClass={ControlLabel} sm={4}>
+              To Hit
+            </Col>
 
-          <Col sm={4}>
-            <FormControl onChange={this.handleChange} value={character.toHit} type="text" placeholder="To Hit" />
-          </Col>
-        </FormGroup>
-        <FormGroup controlId='passiveWisdom'>
-          <Col componentClass={ControlLabel} sm={4}>
-            Passive Wisdom (perception)
-          </Col>
+            <Col sm={4}>
+              <FormControl onChange={this.handleChange} value={character.toHit} type="text" placeholder="To Hit" />
+            </Col>
+          </FormGroup>
+          <FormGroup controlId='passiveWisdom'>
+            <Col componentClass={ControlLabel} sm={4}>
+              Passive Wisdom (perception)
+            </Col>
 
-          <Col sm={4}>
-            <FormControl onChange={this.handleChange} value={character.passiveWisdom} type="text" placeholder="Passive Wisdom" />
-          </Col>
-        </FormGroup>
-        <FormGroup controlId='initiative'>
-          <Col componentClass={ControlLabel} sm={4}>
-            Initiative
-          </Col>
+            <Col sm={4}>
+              <FormControl onChange={this.handleChange} value={character.passiveWisdom} type="text" placeholder="Passive Wisdom" />
+            </Col>
+          </FormGroup>
+          <FormGroup controlId='initiative'>
+            <Col componentClass={ControlLabel} sm={4}>
+              Initiative
+            </Col>
 
-          <Col sm={4}>
-            <FormControl onChange={this.handleChange} value={character.initiative} type="text" placeholder="Initiative" />
-          </Col>
-        </FormGroup>
+            <Col sm={4}>
+              <FormControl onChange={this.handleChange} value={character.initiative} type="text" placeholder="Initiative" />
+            </Col>
+          </FormGroup>
 
-        <FormGroup controlId='currentHitPoints'>
-          <Col componentClass={ControlLabel} sm={4}>
-            Current Hit Points
-          </Col>
+          <FormGroup controlId='currentHitPoints'>
+            <Col componentClass={ControlLabel} sm={4}>
+              Current Hit Points
+            </Col>
 
-          <Col sm={4}>
-            <FormControl onChange={this.handleChange} value={character.currentHitPoints} type="text" placeholder="Hit Points" />
-          </Col>
-        </FormGroup>
+            <Col sm={4}>
+              <FormControl onChange={this.handleChange} value={character.currentHitPoints} type="text" placeholder="Hit Points" />
+            </Col>
+          </FormGroup>
 
-        <FormGroup controlId='maxHitPoints'>
-          <Col componentClass={ControlLabel} sm={4}>
-            Max Hit Points (HP)
-          </Col>
+          <FormGroup controlId='maxHitPoints'>
+            <Col componentClass={ControlLabel} sm={4}>
+              Max Hit Points (HP)
+            </Col>
 
-          <Col sm={4}>
-            <FormControl onChange={this.handleChange} value={character.maxHitPoints} type="text" placeholder="Hit Points" />
-          </Col>
-        </FormGroup>
+            <Col sm={4}>
+              <FormControl onChange={this.handleChange} value={character.maxHitPoints} type="text" placeholder="Hit Points" />
+            </Col>
+          </FormGroup>
 
-        <FormGroup controlId='isNpc'>
-          <Col componentClass={ControlLabel} sm={4}>
-            NPC?
-          </Col>
+          <FormGroup controlId='isNpc'>
+            <Col componentClass={ControlLabel} sm={4}>
+              NPC?
+            </Col>
 
-          <Col sm={8}>
-            <Checkbox onChange={this.handleChange} inline id='isNpc' />
-          </Col>
-        </FormGroup>
+            <Col sm={8}>
+              <Checkbox onChange={this.handleChange} inline id='isNpc' />
+            </Col>
+          </FormGroup>
 
-        <Button bsStyle='success' onClick={() => this.props.saveCharacter(this.state.character)} block>
-          <Glyphicon glyph='plus' />
-        </Button>
-      </Form>
+          <Button bsStyle='success' onClick={() => this.props.saveCharacter(this.state.character)} block>
+            <Glyphicon glyph='plus' />
+          </Button>
+        </Form>
+      </Panel>
     );
   }
 }

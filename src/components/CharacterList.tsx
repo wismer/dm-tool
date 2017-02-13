@@ -3,23 +3,28 @@ import { connect } from 'react-redux';
 import { SavedCharacter } from '../interfaces';
 import {
   Panel,
-  Button,
+  Row,
+  // Button,
+  Col,
   ListGroup,
   ListGroupItem
 } from 'react-bootstrap';
 import { characterListDispatch } from '../redux/dispatchers';
 import { characterList } from '../redux/reducers/tools';
-import AddCharacterModal from './AddCharacter';
+import AddCharacter from './AddCharacter';
 
 
 type ContainerProps = {
-  characters: Array<SavedCharacter>,
+  characters: Array<SavedCharacter>;
+  filter: null | string;
   addCharactersToEncounter: (characters: SavedCharacter[]) => void;
+  onCharSelect: (char: SavedCharacter, fromList: boolean) => void;
+  activeIdx: number;
 };
 type ContainerState = { open: boolean, selectedCharacters: SavedCharacter[] };
 
 
-class CharacterListContainer extends React.Component<ContainerProps, ContainerState> {
+class CharacterListView extends React.Component<ContainerProps, ContainerState> {
   constructor(props: ContainerProps) {
     super(props);
     this.state = { open: false, selectedCharacters: [] };
@@ -45,43 +50,46 @@ class CharacterListContainer extends React.Component<ContainerProps, ContainerSt
   }
 
   render() {
-    const { open, selectedCharacters } = this.state;
     const list = this.props.characters.map((c: SavedCharacter, i: number) => {
-      const isActive = selectedCharacters.find(d => d.id === c.id);
-      let title = '';
-      if (c.isNpc && isActive) {
-        title += `x${c.count}`;
-      } else if (!c.isNpc) {
-        title = `(${c.characterName})`;
-      }
       return (
-        <ListGroupItem onClick={() => this.selectCharacter(c)} active={isActive} key={i} className='character'>
-          {c.playerName} {title}
+        <ListGroupItem onClick={() => this.props.onCharSelect(c, !this.props.filter)} key={i} className='character' active={i === this.props.activeIdx}>
+          <Col xs={6}>{c.name} {c.isNpc ? '(NPC)' : `(${c.name})`} {this.props.filter ? `init: +${c.initiativeRoll || 0}` : ''}</Col>
+          <Col xs={4}>HP: {c.currentHitPoints}</Col>
         </ListGroupItem>
       );
     });
+
     return (
-      <div className='character-list'>
-        <Panel header='Available Characters'>
-          <ListGroup>
-            {list}
-          </ListGroup>
-
-          <Button bsStyle='success' block onClick={() => this.setState({ open: !open, selectedCharacters })}>
-            Add Character
-          </Button>
-
-          <Button bsStyle='success' block onClick={this.saveCharactersToEncounter}>
-            Add Selected to current Encounter
-          </Button>
-        </Panel>
-
-        <Panel collapsible expanded={this.state.open}>
-          <AddCharacterModal isOpen={this.state.open} />
-        </Panel>
-      </div>
+      <Col className='character-list'>
+        <Col xs={6}><ListGroup>{list}</ListGroup></Col>
+        {this.props.children ? <Col xs={6}>{this.props.children}</Col> : ''}
+      </Col>
     );
   }
 }
 
-export const CharacterList = connect(characterList, characterListDispatch)(CharacterListContainer);
+export const CharacterListContainer = (props: any) => {
+  return (
+    <div>
+      <Row>
+        <Col xs={12}>
+          <AddCharacter />
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={6}>
+          <Panel header='NPCS'>
+            <CharacterList filter='npcs' />
+          </Panel>
+        </Col>
+        <Col xs={6}>
+          <Panel header='Player Characters'>
+            <CharacterList filter='players' />
+          </Panel>
+        </Col>
+      </Row>
+    </div>
+  );
+}
+
+export const CharacterList = connect(characterList, characterListDispatch)(CharacterListView);

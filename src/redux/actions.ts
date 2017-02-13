@@ -3,8 +3,11 @@ import {
   SavedCharacter,
   Character,
   ToolChoice,
-  CharDesc
+  Encounter,
+  EncounterUpdate
 } from '../interfaces';
+
+import * as api from '../api';
 
 interface Dispatch {
   (action: any): AppState;
@@ -72,18 +75,17 @@ export function saveCharacter(character: Character): AppUpdate {
 }
 
 export const SAVE_ENCOUNTER_INIT = 'SAVE_ENCOUNTER_INIT';
-
-function saveEncounterInit(): any {
-  return {
-    type: SAVE_ENCOUNTER_INIT
-  };
-}
+//
+// function saveEncounterInit(): any {
+//   return {
+//     type: SAVE_ENCOUNTER_INIT
+//   };
+// }
 
 export const SAVE_ENCOUNTER_FINISH = 'SAVE_ENCOUNTER_FINISH';
 
-function saveEncounterFinish(response: any): any {
-  let encounter = JSON.parse(response.target.responseText);
-  encounter.roster = []; // FIXME
+function saveEncounterFinish(data: string): any {
+  let encounter = JSON.parse(data);
   return {
     type: SAVE_ENCOUNTER_FINISH,
     encounter
@@ -92,8 +94,7 @@ function saveEncounterFinish(response: any): any {
 
 export const SAVE_CHARACTER = 'SAVE_CHARACTER';
 
-function saveCharacterFinish(response: any): any {
-  let character = JSON.parse(response.target.responseText);
+function saveCharacterFinish(character: Character): any {
   return {
     type: SAVE_CHARACTER,
     character
@@ -102,35 +103,41 @@ function saveCharacterFinish(response: any): any {
 
 export function addCharacter(character: Character): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    let xhr: XMLHttpRequest = new XMLHttpRequest();
-    xhr.addEventListener('loadend', (response) => {
-      dispatch(saveCharacterFinish(response));
+    api.saveCharacter(character).then(() => {
+      dispatch(saveCharacterFinish(character));
     });
-    xhr.open('POST', `http://localhost:8000/api/character/`);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(character));
+  }
+}
 
+export const CHARACTER_LIST_LOAD = 'CHARACTER_LIST_LOAD';
+export function characterListLoad(characters: SavedCharacter[]): any {
+  return {
+    characters,
+    type: CHARACTER_LIST_LOAD
   };
 }
 
-export function saveEncounter(): AppUpdate {
+export function saveEncounter(encounter: Encounter): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    const { tools } = getState();
-    const { enemies, players, name, surpriseRound } = tools.createEncounter;
-    const roster = enemies.concat(players).map(c => ({id: c.id, count: c.count || 1, intiativeRoll: c.initiativeRoll}))
-    let encounter = {
-      roster,
-      name,
-      surpriseRound
-    };
-    dispatch(saveEncounterInit());
-    let xhr: XMLHttpRequest = new XMLHttpRequest();
-    xhr.addEventListener('loadend', (response) => {
-      dispatch(saveEncounterFinish(response));
+    api.saveEncounter(encounter).then((data: string) => {
+      dispatch(saveEncounterFinish(data))
     });
-    xhr.open('POST', `http://localhost:8000/api/encounter/`);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(encounter));
+    // const { tools } = getState();
+    // const { enemies, players, name, surpriseRound } = tools.createEncounter;
+    // const roster = enemies.concat(players).map(c => ({id: c.id, count: c.count || 1, intiativeRoll: c.initiativeRoll}))
+    // let encounter = {
+    //   roster,
+    //   name,
+    //   surpriseRound
+    // };
+    // dispatch(saveEncounterInit());
+    // let xhr: XMLHttpRequest = new XMLHttpRequest();
+    // xhr.addEventListener('loadend', (response) => {
+    //   dispatch(saveEncounterFinish(response));
+    // });
+    // xhr.open('POST', `http://localhost:8000/api/encounter/`);
+    // xhr.setRequestHeader('Content-Type', 'application/json');
+    // xhr.send(JSON.stringify(encounter));
   };
 }
 
@@ -145,28 +152,6 @@ export function addCharactersToEncounter(characters: SavedCharacter[]): any {
 }
 
 export const UPDATE_INITIATIVE_SCORE = 'UPDATE_INITIATIVE_SCORE';
-
-
-function updateInitiativeScore(c: CharDesc, score: number): any {
-  return {
-    type: UPDATE_INITIATIVE_SCORE,
-    character: c,
-    score
-  };
-}
-
-export function updateEncounter(key: string, data: any): any {
-  if (key === 'init') {
-    return updateInitiativeScore(data.c, data.v);
-  } else {
-    return {
-      type: 'UPDATE_ENCOUNTER',
-      key,
-      value: data.v
-    };
-  }
-}
-
 
 /*
 // return (dispatch: Dispatch, getState: () => AppState) => {
@@ -184,7 +169,6 @@ export function updateEncounter(key: string, data: any): any {
 //     // TODO add error handling if no activeEncounter
 //   }
 // }
-
 */
 
 export function querySpells(query: string): AppUpdate {
@@ -204,29 +188,66 @@ export function querySpells(query: string): AppUpdate {
 /* ENCOUNTER STATE LOAD */
 
 export const ENCOUNTER_STATE_LOAD = 'ENCOUNTER_STATE_LOAD';
+export const ENCOUNTER_DETAIL_LOAD = 'ENCOUNTER_DETAIL_LOAD';
 
-function encounterStateLoad(response: any): any {
-  let { encounters, characters } = JSON.parse(response.target.responseText);
+function encounterStateLoad(response: any, detail?: boolean): any {
+  if (detail) {
+    return {
+      type: ENCOUNTER_DETAIL_LOAD,
+      encounter: JSON.parse(response.target.responseText)
+    };
+  } else {
+    let { encounters, characters } = response;
+    return {
+      type: ENCOUNTER_STATE_LOAD,
+      encounters,
+      characters: characters.map((char: SavedCharacter) => {
+        char.count = 1;
+        return char;
+      })
+    };
+  }
+}
+
+export const LOAD_ENCOUNTERS_INIT = 'LOAD_ENCOUNTERS_INIT';
+
+function loadEncountersInit(): any {
   return {
-    type: ENCOUNTER_STATE_LOAD,
-    encounters,
-    characters: characters.map((char: SavedCharacter) => {
-      char.count = 1;
-      return char;
-    })
+    type: LOAD_ENCOUNTERS_INIT,
   };
 }
 
-export function retrieveEncounterData(): AppUpdate {
+
+
+export function retrieveEncounterData(params: any): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    let xhr: XMLHttpRequest = new XMLHttpRequest();
-    xhr.addEventListener('loadend', (response) => {
-      dispatch(encounterStateLoad(response));
+    dispatch(loadEncountersInit());
+    let pro = api.getEncounters(params)
+
+    pro.then((text: string) => {
+      dispatch(encounterStateLoad(JSON.parse(text)));
     });
-    xhr.open('GET', `http://localhost:8000/api/encounter`);
-    xhr.send();
   }
 }
+
+// export function retrieveEncounterData(params: any): AppUpdate {
+//   return <T>(dispatch: Dispatch, getState: () => AppState): Promise<T> => {
+//     dispatch(loadEncountersInit())
+//     return new Promise((resolve, reject) => {
+//       let xhr: XMLHttpRequest = new XMLHttpRequest();
+//       xhr.addEventListener('loadend', (response) => {
+//         if (xhr.status === 200) {
+//           dispatch(encounterStateLoad(response, typeof params.id !== 'undefined'));
+//           resolve();
+//         } else {
+//           reject();
+//         }
+//       });
+//       xhr.open('GET', `http://localhost:8000/api/encounter/${params.id ? params.id : ''}`);
+//       xhr.send();
+//     });
+//   }
+// }
 
 export const SWITCH_ACTIVE_ENCOUNTER = 'SWITCH_ACTIVE_ENCOUNTER';
 
@@ -234,5 +255,66 @@ export function switchActiveEncounter(id: number | null): any {
   return {
     type: SWITCH_ACTIVE_ENCOUNTER,
     id
+  };
+}
+
+export const GET_ENCOUNTER = 'GET_ENCOUNTER';
+
+export function getEncounter(id: number | string): any {
+  return {
+    type: GET_ENCOUNTER,
+    id
+  }
+}
+
+export const UPDATE_HIT_POINTS = 'UPDATE_HIT_POINTS';
+
+export function updateHitPoints(hp: number, charStateID: number, encounterID: number): any {
+  return {
+    type: UPDATE_HIT_POINTS,
+    hp, charStateID, encounterID
+  };
+}
+
+export const END_ROUND_INIT = 'END_ROUND_INIT';
+export const END_ROUND_FINISH = 'END_ROUND_FINISH';
+
+export function endRoundInit(id: number): any {
+  return {
+    type: END_ROUND_INIT,
+    id
+  };
+}
+
+function endRoundFinish(data: any): any {
+  return {
+    type: END_ROUND_FINISH,
+    ...data
+  };
+}
+
+export function endRound(id: number, endOfRound: boolean) {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    let { tools } = getState();
+    let encounter = tools.encounters.find((e: Encounter) => e.id === id);
+    if (!encounter) {
+      return;
+    }
+    let data: EncounterUpdate = {
+      id,
+      endOfRound,
+      roster: encounter.roster.map(c => {
+        return {
+          id: c.id,
+          characterstate: c.id,
+          readiedAction: false,
+          currentHitPoints: c.currentHitPoints || 0
+        };
+      })
+    };
+
+    api.endEncounterRound(data).then((response: string) => {
+      dispatch(endRoundFinish(JSON.parse(response)))
+    });
   };
 }

@@ -57,6 +57,7 @@ export interface Character {
   toHit?: number;
   passiveWisdom?: number;
   initiative?: number;
+  initiativeRoll?: number;
   conditions?: string[];
   currentHitPoints?: number;
   maxHitPoints: number;
@@ -75,6 +76,7 @@ export interface ContainerProps {
 
 export interface SavedCharacter extends Character {
   id: number;
+  name: string;
   count?: number;
 }
 
@@ -102,8 +104,8 @@ export interface CharacterState extends Character {
 }
 
 export interface Encounter {
-  name: string;
-  roster: Array<CharacterState>;
+  name: string | null;
+  roster: Array<SavedCharacter | Character>;
   currentTurn: number;
   id: null | number;
   surpriseRound: boolean;
@@ -123,17 +125,18 @@ export interface CharDesc {
 }
 
 export interface EncounterCreation {
-  enemies: CharDesc[];
-  players: CharDesc[];
   surpriseRound: boolean;
   currentTurn: number;
   name: string;
 }
 
-export interface EncounterCreationProps extends EncounterCreation {
-  handleChange: () => void;
-  saveEncounter: () => void;
-  updateEncounter: (field: string, d: any) => void;
+export interface EncounterCreationProps {
+  npcs: Character[];
+  players: Character[];
+  saveEncounter: (encounter: Encounter) => void;
+  children?: any;
+  onCharSelect?: (char: Character, fromList: boolean) => void;
+  onChange: (field: string, value: number | string | boolean) => void;
 }
 
 export interface EncounterListProps {
@@ -145,9 +148,9 @@ export interface ToolState {
   turnOrder: TurnOrder;
   encounters: Array<Encounter>;
   characters: Array<SavedCharacter>;
-  createEncounter: EncounterCreation;
   activeEncounter: null | number;
   activeTool: ToolChoice;
+  isLoading: boolean;
 }
 
 export interface Race {
@@ -176,4 +179,26 @@ export interface EncounterTool extends Tool {
   id: null | number;
   currentTurn: number;
   surpriseRound: boolean;
+}
+
+export enum MenuOptions {
+  None = 0,
+  Encounters = 1,
+  SpellLookup = 2,
+}
+
+type Condition = "prone" | "incapacitated" | "stunned" | "poisoned" | "defeaned" | "frightened" | "charmed" | "invisible" | "paralyzed" | "petrified" | "blinded"
+
+export interface CharacterStateUpdate {
+  id?: number | null;
+  characterstate?: number | null;
+  currentHitPoints: number;
+  readiedAction?: boolean;
+  conditions?: Condition[] | never[];
+}
+
+export interface EncounterUpdate {
+  id: number;
+  endOfRound: boolean;
+  roster: Array<CharacterStateUpdate>;
 }

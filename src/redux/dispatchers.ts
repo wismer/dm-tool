@@ -1,13 +1,14 @@
 import {
+  endRound,
   querySpells,
   addCharacter,
   changeTool,
   saveEncounter,
-  switchActiveEncounter,
   addCharactersToEncounter,
-  updateEncounter
+  updateHitPoints,
+  retrieveEncounterData
 } from './actions';
-import { AppState, Character, ToolChoice, SavedCharacter } from '../interfaces';
+import { AppState, Character, ToolChoice, SavedCharacter, Encounter } from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState
@@ -47,20 +48,32 @@ export function toolDispatch(dispatch: Dispatch): any {
 
 export function encounterDispatch(dispatch: Dispatch): any {
   return {
-    saveEncounter: () => {
-      dispatch(saveEncounter());
+    saveEncounter: (encounter: Encounter) => {
+      dispatch(saveEncounter(encounter));
     },
 
-    updateEncounter: (key: string, data: any) => {
-      dispatch(updateEncounter(key, data));
+    alterHitPoints: (hp: number, charStateID: number, encounterID: number) => {
+      dispatch(updateHitPoints(hp, charStateID, encounterID));
     }
   }
 }
 
 export function encounterListDispatch(dispatch: Dispatch): any {
   return {
-    switchActiveEncounter: (id: number | null) => {
-      dispatch(switchActiveEncounter(id));
+    retrieveEncounterData: () => {
+      dispatch(retrieveEncounterData({}));
+    }
+  }
+}
+
+export function encounterViewDispatch(dispatch: Dispatch): any {
+  return {
+    alterHitPoints: (hp: number, charStateID: number, encounterID: number) => {
+      dispatch(updateHitPoints(hp, charStateID, encounterID))
+    },
+
+    endRound: (id: number, endOfRound: boolean) => {
+      dispatch(endRound(id, endOfRound))
     }
   }
 }
