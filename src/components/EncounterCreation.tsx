@@ -19,7 +19,6 @@ import {
   Character,
   Encounter,
 } from '../interfaces';
-import { CharacterList } from './CharacterList';
 
 type EncounterFormState = {
   players: Character[];
@@ -165,15 +164,13 @@ function CreateEncounterContainer(props: EncounterCreationProps) {
         {props.children}
 
         <Panel header='Players'>
-          <CharacterList filter='players' characters={props.players} onCharSelect={props.onCharSelect} />
+
         </Panel>
 
         <Panel header='Enemies / NPCs'>
-          <CharacterList filter='npcs' onCharSelect={props.onCharSelect} characters={props.npcs} />
         </Panel>
       </Col>
       <Col xs={4}>
-        <CharacterList onCharSelect={props.onCharSelect} />
       </Col>
     </div>
   );

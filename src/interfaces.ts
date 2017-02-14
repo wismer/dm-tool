@@ -202,3 +202,15 @@ export interface EncounterUpdate {
   endOfRound: boolean;
   roster: Array<CharacterStateUpdate>;
 }
+
+
+export interface CharacterListProps {
+  characters: SavedCharacter[];
+  activeIdx: null | number;
+  filter?: string;
+};
+
+export interface CharacterListDispatchProps extends CharacterListProps {
+  fetchCharacters: () => void;
+  selectCharacter: (char: SavedCharacter) => void;
+}

@@ -18,8 +18,9 @@ export function saveCharacter<T, C>(character: C): Promise<T> {
   return new Promise((resolve, reject) => {
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', () => {
-      if (xhr.status === 200) {
-        resolve();
+      if (xhr.status === 201) {
+        let data = JSON.parse(xhr.responseText);
+        resolve(data);
       } else {
         reject('FAILED');
       }

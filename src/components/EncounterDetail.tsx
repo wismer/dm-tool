@@ -9,7 +9,7 @@ import {
   Panel,
   Row
 } from 'react-bootstrap';
-import {CharacterList} from './CharacterList';
+import CharacterList from './CharacterList';
 import {
   Encounter,
 } from '../interfaces';

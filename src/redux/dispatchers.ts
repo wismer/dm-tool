@@ -6,7 +6,8 @@ import {
   saveEncounter,
   addCharactersToEncounter,
   updateHitPoints,
-  retrieveEncounterData
+  retrieveEncounterData,
+  characterListInit
 } from './actions';
 import { AppState, Character, ToolChoice, SavedCharacter, Encounter } from '../interfaces';
 
@@ -34,6 +35,14 @@ export function characterListDispatch(dispatch: Dispatch): any {
   return {
     addCharactersToEncounter: (characters: SavedCharacter[]): void => {
       dispatch(addCharactersToEncounter(characters));
+    },
+
+    fetchCharacters: () => {
+      dispatch(characterListInit());
+    },
+
+    selectCharacter: (char: SavedCharacter): void => {
+      // TODO
     }
   };
 }

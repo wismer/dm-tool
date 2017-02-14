@@ -54,23 +54,19 @@ function saveCharacterInit(): any {
 
 export const FINISH_SAVE_CHARACTER_DM_TOOL = 'FINISH_SAVE_CHARACTER_DM_TOOL';
 
-function finishSaveCharacter(response: any): any {
+function finishSaveCharacter(character: SavedCharacter): any {
   return {
     type: FINISH_SAVE_CHARACTER_DM_TOOL,
-    character: JSON.parse(response.target.responseText)
+    character
   }
 }
 
 export function saveCharacter(character: Character): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
     dispatch(saveCharacterInit());
-    let xhr: XMLHttpRequest = new XMLHttpRequest();
-    xhr.addEventListener('loadend', (response) => {
-      dispatch(finishSaveCharacter(response));
+    api.saveCharacter(character).then((data: SavedCharacter) => {
+      dispatch(finishSaveCharacter(data));
     });
-    xhr.open('POST', `http://localhost:8000/api/encounter/`);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(character));
   }
 }
 
@@ -107,6 +103,15 @@ export function addCharacter(character: Character): AppUpdate {
       dispatch(saveCharacterFinish(character));
     });
   }
+}
+
+export const CHARACTER_LIST_INIT = 'CHARACTER_LIST_INIT';
+export function characterListInit(): AppUpdate {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    api.getCharacters().then((characters: SavedCharacter[]) => {
+      dispatch(characterListLoad(characters));
+    });
+  };
 }
 
 export const CHARACTER_LIST_LOAD = 'CHARACTER_LIST_LOAD';
