@@ -4,6 +4,7 @@ import {
   TurnOrder,
   AppState,
   EncounterListProps,
+  CharacterListProps,
   SavedCharacter,
   Encounter
  } from '../../interfaces';
@@ -44,14 +45,10 @@ const initialState: ToolState = {
   activeEncounter: null
 };
 
-function addCharacterToList(state: ToolState, character: any): ToolState {
-  let { turnOrder } = state;
-
-  turnOrder = Object.assign({}, turnOrder, {
-    players: [...turnOrder.players, character],
+function addCharacterToList(state: ToolState, character: SavedCharacter): ToolState {
+  return Object.assign({}, state, {
+    characters: [...state.characters, character]
   });
-
-  return Object.assign({}, state, { turnOrder });
 }
 
 function changeTool(state: ToolState, tool: ToolChoice): ToolState {
@@ -173,25 +170,21 @@ export function tools(state: ToolState, action: any): ToolState {
   }
 }
 
-export function characterList(state: AppState, props: any): {characters: Array<SavedCharacter>, filter: string | null, activeIdx: number} {
-  if (props.characters) {
-    return { characters: props.characters, filter: props.filter, activeIdx: props.activeIdx };
+export function characterListProps(state: AppState, props: any): CharacterListProps {
+  let characters;
+
+  if (props.filter && props.filter === 'npcs') {
+    characters = state.tools.characters.filter(c => c.isNpc);
+  } else if (props.filter && props.filter === 'players') {
+    characters = state.tools.characters.filter(c => !c.isNpc);
+  } else {
+    characters = state.tools.characters;
   }
-  switch (props.filter) {
-    case 'npcs':
-      return {
-        characters: state.tools.characters.filter(c => c.isNpc),
-        filter: props.filter,
-        activeIdx: props.activeIdx
-      };
-    case 'players':
-      return {
-        characters: state.tools.characters.filter(c => !c.isNpc),
-        filter: props.filter,
-        activeIdx: props.activeIdx
-      };
-    default: return { characters: state.tools.characters, filter: props.filter, activeIdx: props.activeIdx };
-  }
+
+  return {
+    characters,
+    activeIdx: props.activeIdx
+  };
 }
 
 export function addCharacterProps(state: AppState, props: any): {isOpen: boolean} {

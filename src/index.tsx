@@ -11,7 +11,7 @@ import EncounterList from './components/EncounterList';
 import MainMenu from './components/MainMenu';
 import * as api from './api';
 import SpellSearch from './components/SpellSearch';
-import { CharacterListContainer } from './components/CharacterList';
+import CharacterView from './components/CharacterView';
 import EncounterDetail from './components/EncounterDetail';
 import EncounterCreation from './components/EncounterCreation';
 import {
@@ -40,13 +40,7 @@ function AppContainer() {
               });
             }} />
             <Route path='/dm-tools/create-encounter/' component={EncounterCreation} />
-            <Route path='/dm-tools/characters' getComponent={(prevState: any, cb?: any) => {
-              api.getCharacters().then((characters: any) => {
-                store.dispatch({ type: 'CHARACTER_LIST_LOAD', characters });
-                cb(null, CharacterListContainer);
-              });
-            }} />
-
+            <Route path='/dm-tools/characters' component={CharacterView} />
             <Route path='/dm-tools/spells/' component={SpellSearch} />
           </Route>
         </Route>
