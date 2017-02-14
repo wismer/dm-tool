@@ -21,8 +21,8 @@ import {
 const store = createStore(reducers, applyMiddleware(logger, thunkMiddleware));
 
 
-function Thing(props: any) {
-  return <div>{props.children}</div>;
+function Main(props: any) {
+  return <div className='container-fluid main'>{props.children}</div>;
 }
 
 function AppContainer() {
@@ -30,8 +30,8 @@ function AppContainer() {
     <Provider store={store}>
       <Router history={hashHistory}>
         <Route path='/' component={App}>
-          <IndexRoute components={{sidebar: MainMenu, main: Thing}} />
-          <Route path='/dm-tools' components={{sidebar: DMMenu, main: Thing}}>
+          <IndexRoute components={{sidebar: MainMenu, main: Main}} />
+          <Route path='/dm-tools' components={{sidebar: DMMenu, main: Main}}>
             <Route path='/dm-tools/encounters/' component={EncounterList} />
             <Route path='/dm-tools/encounters/:id/' getComponent={(prevState: Router.RouterState, cb?: any) => {
               api.getEncounters(prevState.params).then((data: string) => {
@@ -40,7 +40,7 @@ function AppContainer() {
               });
             }} />
             <Route path='/dm-tools/create-encounter/' component={EncounterCreation} />
-            <Route path='/dm-tools/characters' component={CharacterView} />
+            <Route path='/dm-tools/characters/' component={CharacterView} />
             <Route path='/dm-tools/spells/' component={SpellSearch} />
           </Route>
         </Route>

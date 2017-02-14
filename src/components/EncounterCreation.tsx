@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import {
-  Panel,
   Form,
   FormGroup,
   Checkbox,
@@ -19,6 +18,8 @@ import {
   Character,
   Encounter,
 } from '../interfaces';
+import CharacterList from './CharacterList';
+
 
 type EncounterFormState = {
   players: Character[];
@@ -160,17 +161,10 @@ function CreateEncounterContainer(props: EncounterCreationProps) {
             </Col>
           </FormGroup>
         </Form>
-
         {props.children}
-
-        <Panel header='Players'>
-
-        </Panel>
-
-        <Panel header='Enemies / NPCs'>
-        </Panel>
       </Col>
       <Col xs={4}>
+        <CharacterList filter='players' />
       </Col>
     </div>
   );
