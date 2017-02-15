@@ -1,15 +1,30 @@
-import { Encounter, EncounterUpdate } from './interfaces';
-export function getEncounters<T>(params: any): Promise<T> {
+import {
+  Encounter,
+  EncounterUpdate,
+  // JSONListResponse,
+  // JSONError,
+  ServerCode
+} from './interfaces';
+
+export function getEncounters<T>(routerLocation: any, params: { id?: string }, page: number): Promise<T> {
   return new Promise((resolve, reject) => {
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', () => {
-      if (xhr.status === 200) {
-        resolve(xhr.responseText);
+      // let url = 'http://localhost:8000/api/encounter/';
+      let data = JSON.parse(xhr.responseText);
+      if (xhr.status === ServerCode.OK) {
+        resolve(data);
       } else {
-        reject('FAILED');
+        reject(data);
       }
     });
-    xhr.open('GET', `http://localhost:8000/api/encounter/${params.id ? params.id : ''}`);
+    let url = 'http://localhost:8000/api/encounter/';
+    if (params.id) {
+      url += `${params.id}/`;
+    } else {
+      url += `?page=${page}`;
+    }
+    xhr.open('GET', url);
     xhr.send();
   });
 }
@@ -18,11 +33,11 @@ export function saveCharacter<T, C>(character: C): Promise<T> {
   return new Promise((resolve, reject) => {
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', () => {
+      const data = JSON.parse(xhr.responseText);
       if (xhr.status === 201) {
-        let data = JSON.parse(xhr.responseText);
         resolve(data);
       } else {
-        reject('FAILED');
+        reject(data);
       }
     });
     xhr.open('POST', `http://localhost:8000/api/character/`);
@@ -35,7 +50,7 @@ export function getCharacters<T>(): Promise<T> {
   return new Promise((resolve, reject) => {
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', () => {
-      if (xhr.status === 200) {
+      if (xhr.status === ServerCode.OK) {
         resolve(JSON.parse(xhr.responseText).results);
       } else {
         reject('FAILED');
@@ -50,7 +65,7 @@ export function saveEncounter<T>(encounter: Encounter): Promise<T> {
   return new Promise((resolve, reject) => {
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', () => {
-      if (xhr.status < 300) {
+      if (xhr.status === ServerCode.RESOURCE_ADDED) {
         resolve(xhr.responseText);
       } else {
         reject('FAILED');

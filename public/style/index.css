@@ -14,3 +14,13 @@
 .init-roll {
   float: right;
 }
+
+.encounter-list a {
+  display: flex;
+  justify-content: space-around;
+}
+
+.encounter-list-name {
+  align-self: flex-start;
+  width: 33%;
+}

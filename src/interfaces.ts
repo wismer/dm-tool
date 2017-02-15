@@ -1,3 +1,5 @@
+import * as R from '@types/react-router';
+
 export enum SpellComponent {
   Verbal = 1,
   Somatic = 2,
@@ -139,9 +141,19 @@ export interface EncounterCreationProps {
   onChange: (field: string, value: number | string | boolean) => void;
 }
 
-export interface EncounterListProps {
+export type RouterLocation = {
+  hash: string;
+  pathname: string;
+  search: string;
+  state?: any;
+  query: { [name: string]: string }
+}
+
+export interface EncounterListProps extends R.RouterState {
   encounters: Array<Encounter>;
   activeEncounter: null | number;
+  activePage: number;
+  maxPage: number;
 }
 
 export interface ToolState {
@@ -151,6 +163,8 @@ export interface ToolState {
   activeEncounter: null | number;
   activeTool: ToolChoice;
   isLoading: boolean;
+  encounterPage: number;
+  maxEncounterPage: number;
 }
 
 export interface Race {
@@ -213,4 +227,23 @@ export interface CharacterListProps {
 export interface CharacterListDispatchProps extends CharacterListProps {
   fetchCharacters: () => void;
   selectCharacter: (char: SavedCharacter) => void;
+}
+
+export interface JSONListResponse<T> {
+  results: T[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+}
+
+export interface JSONError {
+  field: string;
+  errors: string[];
+}
+
+export enum ServerCode {
+  OK = 200,
+  RESOURCE_ADDED = 201,
+  USER_ERROR = 400,
+  // will add more later
 }

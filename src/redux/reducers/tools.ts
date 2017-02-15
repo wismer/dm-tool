@@ -13,6 +13,7 @@ import {
   FINISH_SAVE_CHARACTER_DM_TOOL,
   LOAD_ENCOUNTERS_INIT,
   SAVE_ENCOUNTER_FINISH,
+  CHANGE_ENCOUNTER_PAGE,
   ENCOUNTER_STATE_LOAD,
   ENCOUNTER_DETAIL_LOAD,
   SAVE_CHARACTER,
@@ -37,6 +38,8 @@ const initialTool: TurnOrder = {
 };
 
 const initialState: ToolState = {
+  encounterPage: 1,
+  maxEncounterPage: 1,
   turnOrder: initialTool,
   isLoading: false,
   activeTool: 1,
@@ -61,10 +64,10 @@ function addEncounter(state: ToolState, encounter: Encounter) {
   });
 }
 
-function loadEncounters(state: ToolState, action: { encounters: Encounter[], characters: Character[] }): ToolState {
+function loadEncounters(state: ToolState, encounters: Encounter[], maxEncounterPage: number): ToolState {
   return Object.assign({}, state, {
-    encounters: action.encounters,
-    characters: action.characters,
+    maxEncounterPage,
+    encounters,
     isLoading: false
   });
 }
@@ -87,8 +90,7 @@ function loadEncountersInit(state: ToolState): ToolState {
   return Object.assign({}, state, { isLoading: true });
 }
 
-function loadEncounterDetail(state: ToolState, action: any): ToolState {
-  const { encounter } = action;
+function loadEncounterDetail(state: ToolState, encounter: Encounter): ToolState {
   let encounters = state.encounters.filter(e => e.id !== encounter.id);
   return Object.assign({}, state, { encounters: [...encounters, encounter], isLoading: false });
 }
@@ -134,6 +136,10 @@ function endRoundFinish(state: ToolState, action: any): ToolState {
 }
 
 
+function changeEncounterPage(state: ToolState, encounterPage: number): ToolState {
+  return Object.assign({}, state, { encounterPage });
+}
+
 export function tools(state: ToolState, action: any): ToolState {
   if (!state) {
     return initialState;
@@ -147,13 +153,15 @@ export function tools(state: ToolState, action: any): ToolState {
     case CHARACTER_LIST_LOAD:
       return characterListLoad(state, action.characters);
     case SAVE_ENCOUNTER_INIT:
-      return state; // TODO
+      return Object.assign({}, state, { isLoading: true }); // TODO
     case SAVE_ENCOUNTER_FINISH:
       return addEncounter(state, action.encounter);
+    case CHANGE_ENCOUNTER_PAGE:
+      return changeEncounterPage(state, action.page);
     case ENCOUNTER_STATE_LOAD:
-      return loadEncounters(state, action);
+      return loadEncounters(state, action.encounters, action.page);
     case ENCOUNTER_DETAIL_LOAD:
-      return loadEncounterDetail(state, action);
+      return loadEncounterDetail(state, action.encounter);
     case UPDATE_HIT_POINTS:
       return updateHitPoints(state, action.charStateID, action.hp, action.encounterID);
     case SWITCH_ACTIVE_ENCOUNTER:
@@ -196,8 +204,11 @@ export function addCharacterProps(state: AppState, props: any): {isOpen: boolean
 export function encounterListProps(state: AppState, props: any): EncounterListProps {
   const { tools } = state;
   return {
+    ...props,
     encounters: tools.encounters,
-    activeEncounter: tools.activeEncounter
+    activeEncounter: tools.activeEncounter,
+    activePage: tools.encounterPage,
+    maxPage: tools.maxEncounterPage,
   };
 }
 
