@@ -7,7 +7,8 @@ import {
   addCharactersToEncounter,
   updateHitPoints,
   retrieveEncounterData,
-  characterListInit
+  characterListInit,
+  changeEncounterPage
 } from './actions';
 import { AppState, Character, ToolChoice, SavedCharacter, Encounter } from '../interfaces';
 
@@ -69,8 +70,12 @@ export function encounterDispatch(dispatch: Dispatch): any {
 
 export function encounterListDispatch(dispatch: Dispatch): any {
   return {
-    retrieveEncounterData: () => {
-      dispatch(retrieveEncounterData({}));
+    retrieveEncounterData: (router: ReactRouter.RouterState, params: { id?: string }) => {
+      dispatch(retrieveEncounterData(router, params));
+    },
+
+    changePage: (page: number) => {
+      dispatch(changeEncounterPage(page))
     }
   }
 }

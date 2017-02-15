@@ -9,7 +9,6 @@ import thunkMiddleware from 'redux-thunk';
 import { Router, Route, hashHistory, IndexRoute } from 'react-router';
 import EncounterList from './components/EncounterList';
 import MainMenu from './components/MainMenu';
-import * as api from './api';
 import SpellSearch from './components/SpellSearch';
 import CharacterView from './components/CharacterView';
 import EncounterDetail from './components/EncounterDetail';
@@ -33,12 +32,7 @@ function AppContainer() {
           <IndexRoute components={{sidebar: MainMenu, main: Thing}} />
           <Route path='/dm-tools' components={{sidebar: DMMenu, main: Thing}}>
             <Route path='/dm-tools/encounters/' component={EncounterList} />
-            <Route path='/dm-tools/encounters/:id/' getComponent={(prevState: Router.RouterState, cb?: any) => {
-              api.getEncounters(prevState.params).then((data: string) => {
-                store.dispatch({ type: 'ENCOUNTER_DETAIL_LOAD', encounter: JSON.parse(data) });
-                cb(null, EncounterDetail);
-              });
-            }} />
+            <Route path='/dm-tools/encounters/:id/' component={EncounterDetail} />
             <Route path='/dm-tools/create-encounter/' component={EncounterCreation} />
             <Route path='/dm-tools/characters' component={CharacterView} />
             <Route path='/dm-tools/spells/' component={SpellSearch} />

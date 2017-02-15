@@ -193,46 +193,49 @@ export function querySpells(query: string): AppUpdate {
 /* ENCOUNTER STATE LOAD */
 
 export const ENCOUNTER_STATE_LOAD = 'ENCOUNTER_STATE_LOAD';
-export const ENCOUNTER_DETAIL_LOAD = 'ENCOUNTER_DETAIL_LOAD';
+function encounterStateLoad(encounters: Encounter[], count: number): any {
+  return {
+    type: ENCOUNTER_STATE_LOAD,
+    encounters,
+    page: Math.ceil(count / 10)
+  };
+}
 
-function encounterStateLoad(response: any, detail?: boolean): any {
-  if (detail) {
-    return {
-      type: ENCOUNTER_DETAIL_LOAD,
-      encounter: JSON.parse(response.target.responseText)
-    };
-  } else {
-    let { encounters, characters } = response;
-    return {
-      type: ENCOUNTER_STATE_LOAD,
-      encounters,
-      characters: characters.map((char: SavedCharacter) => {
-        char.count = 1;
-        return char;
-      })
-    };
-  }
+export const ENCOUNTER_DETAIL_LOAD = 'ENCOUNTER_DETAIL_LOAD';
+function encounterDetailLoad(encounter: Encounter): any {
+  return {
+    type: ENCOUNTER_DETAIL_LOAD,
+    encounter
+  };
 }
 
 export const LOAD_ENCOUNTERS_INIT = 'LOAD_ENCOUNTERS_INIT';
-
 function loadEncountersInit(): any {
   return {
     type: LOAD_ENCOUNTERS_INIT,
   };
 }
 
-
-
-export function retrieveEncounterData(params: any): AppUpdate {
+export function retrieveEncounterData(location: ReactRouter.RouterState, params: { id?: string }): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
+    let { tools } = getState();
     dispatch(loadEncountersInit());
-    let pro = api.getEncounters(params)
-
-    pro.then((text: string) => {
-      dispatch(encounterStateLoad(JSON.parse(text)));
+    api.getEncounters(location, params, tools.encounterPage).then((payload: any) => {
+      if (payload.results) {
+        dispatch(encounterStateLoad(payload.results, payload.count))
+      } else {
+        dispatch(encounterDetailLoad(payload));
+      }
     });
   }
+}
+
+export const CHANGE_ENCOUNTER_PAGE = 'CHANGE_ENCOUNTER_PAGE';
+export function changeEncounterPage(page: number) {
+  return {
+    type: CHANGE_ENCOUNTER_PAGE,
+    page
+  };
 }
 
 // export function retrieveEncounterData(params: any): AppUpdate {

@@ -4,9 +4,10 @@ import { Link } from 'react-router';
 import { Encounter, EncounterListProps } from '../interfaces';
 import {
   ListGroup,
-  // ListGroupItem,
+  ListGroupItem,
   Col,
   PageHeader,
+  Pagination,
 } from 'react-bootstrap';
 import { withRouter } from 'react-router';
 import { encounterListProps } from '../redux/reducers/tools';
@@ -45,14 +46,16 @@ ENCOUNTER
 
 // FIXME yea yea I know this doesn't belong here.
 interface EncounterDispatch {
-  retrieveEncounterData: () => void;
+  retrieveEncounterData: <T, R>(location: T, params: R) => void;
 }
 
-type EncounterListState = { open?: boolean };
-class EncounterListContainer extends React.Component<EncounterListProps & EncounterDispatch, EncounterListState> {
+type ListProps = EncounterListProps & EncounterDispatch;
+
+type EncounterListState = { open?: boolean, activePage: number };
+class EncounterListContainer extends React.Component<ListProps, EncounterListState> {
   constructor(props: EncounterListProps) {
     super(props);
-    this.state = { open: false };
+    this.state = { open: false, activePage: 1 };
   }
 
   componentDidMount() {
@@ -60,7 +63,13 @@ class EncounterListContainer extends React.Component<EncounterListProps & Encoun
   }
 
   fetchData() {
-    this.props.retrieveEncounterData();
+    this.props.retrieveEncounterData(this.props.location, this.props.params);
+  }
+
+  componentWillReceiveProps(nextProps: ListProps) {
+    if (nextProps.activePage !== this.props.activePage) {
+      this.fetchData();
+    }
   }
 
   render() {
@@ -71,9 +80,21 @@ class EncounterListContainer extends React.Component<EncounterListProps & Encoun
 const EncounterList = (props: any) => {
   const encounters = props.encounters.map((e: Encounter, i: number) => {
     return (
-      <Link to={`/dm-tools/encounters/${e.id}/`} key={i} className='list-group-item'>
-        {e.name}
-      </Link>
+      <ListGroupItem key={i} className='encounter-list'>
+        <Link to={`/dm-tools/encounters/${e.id}/`}>
+          <div className='encounter-list-name'>
+            {e.name}
+          </div>
+
+          <div className='encounter-list-roster'>
+            {e.roster.length}
+          </div>
+
+          <div className='encounter-list-created'>
+            {e.created}
+          </div>
+        </Link>
+      </ListGroupItem>
     );
   });
   return (
@@ -82,6 +103,7 @@ const EncounterList = (props: any) => {
       <ListGroup>
         {encounters}
       </ListGroup>
+      <Pagination items={props.maxPage} next prev activePage={props.activePage} onSelect={props.changePage} />
     </Col>
   );
 };
