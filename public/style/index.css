@@ -3,6 +3,19 @@
   background-color: #E6E6E6;
 }
 
+#dungeons-and-dragons {
+  display: flex;
+}
+
+.main {
+  width: 100%;
+}
+
+.sidebar {
+  height: 100%;
+  text-align: right;
+}
+
 .container {
   height: 100%;
 }

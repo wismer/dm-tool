@@ -1,7 +1,6 @@
 import * as React from "react";
 import { connect } from 'react-redux';
 import { AppState } from '../interfaces';
-import { Grid, Col } from 'react-bootstrap';
 
 
 function raceProps(state: AppState): any  {
@@ -11,15 +10,13 @@ function raceProps(state: AppState): any  {
 const ApplicationContainer = (props: any) => {
   const { sidebar, main } = props;
   return (
-    <Grid id='dungeons-and-dragons'>
-      <Col className='sidebar' xs={2}>
+    <div id='dungeons-and-dragons'>
+      <div className='sidebar'>
         {sidebar}
-      </Col>
+      </div>
 
-      <Col className='main' xs={10}>
-        {main}
-      </Col>
-    </Grid>
+      {main}
+    </div>
   );
 }
 
