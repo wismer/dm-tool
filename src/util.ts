@@ -1,4 +1,5 @@
-import { AppState, Character } from './interfaces';
+import { AppState, CharacterState } from './interfaces';
+
 export function fetchPersistentStorage(): AppState | void {
   try {
     let storage: Storage = window.localStorage;
@@ -22,12 +23,12 @@ export function randInt(initiative: number): number {
   return Math.floor(Math.random() * 20) + initiative;
 }
 
-export function CharacterMap(characters: Character[]) {
+export function CharacterMap(characters: CharacterState[]) {
   return {
-    map: (f: (c: Character) => Character) => characters.map(f),
+    map: (f: (c: CharacterState) => CharacterState) => characters.map(f),
     toList: () => characters,
-    sort: (f: (a: Character, b: Character) => number) => characters.sort(f),
-    split: (): { players: Character[], npcs: Character[]} => {
+    sort: (f: (a: CharacterState, b: CharacterState) => number) => characters.sort(f),
+    split: (): { players: CharacterState[], npcs: CharacterState[]} => {
       return {
         players: characters.filter(c => !c.isNpc),
         npcs: characters.filter(c => c.isNpc)

@@ -6,17 +6,6 @@ export enum SpellComponent {
   Material = 3,
 }
 
-export enum ToolChoice {
-  Encounter = 1,
-  SpellLookup = 2,
-  Other = 3
-}
-
-export interface IDPayload {
-  id: number;
-  count: number;
-}
-
 export interface Spell {
   id: number;
   name: string;
@@ -47,29 +36,30 @@ export interface Tool {
 /*
 model Encounter
 many characters (so foreign key on model to Character model)
-
-
 */
 
 export interface Character {
-  playerName?: string;
-  characterName?: string;
-  id?: null | number;
-  armorClass?: number;
-  toHit?: number;
-  passiveWisdom?: number;
-  initiative?: number;
-  initiativeRoll?: number;
-  conditions?: string[];
-  currentHitPoints?: number;
+  playerName: string;
+  characterName: string;
+  armorClass: number;
+  toHit: number;
+  passiveWisdom: number;
+  initiative: number;
   maxHitPoints: number;
   isNpc: boolean;
+  id: number;
 }
 
 export interface CreateCharacterProps {
   saveCharacter: (character: Character) => void;
   isOpen: boolean;
 }
+
+export interface CreateCharacterState {
+  open?: boolean;
+  character: Character;
+}
+
 
 export interface ContainerProps {
   characters: Array<SavedCharacter>,
@@ -78,36 +68,28 @@ export interface ContainerProps {
 
 export interface SavedCharacter extends Character {
   id: number;
-  name: string;
   count?: number;
 }
 
-export interface AddCharacter extends Character {
-  [name: string]: number | string | null | string[] | boolean | undefined;
-}
-
-export interface CreateCharacterState {
-  open?: boolean;
-  character: AddCharacter;
-}
-
-export interface TurnOrder extends Tool {
-  order: number[];
-  players: Array<Character>;
-  enemies: Array<Character>;
-}
-
-export interface CharacterState extends Character {
-  intiativeRoll: number;
+export interface BaseCharState {
+  initiativeRoll: number;
   wasSurprised: boolean;
-  readiedAction: boolean;
   currentHitPoints: number;
-  conditions: string[];
+  isNpc: boolean;
+}
+
+export interface CharacterState extends BaseCharState {
+  conditions: Condition[];
+  readiedAction: boolean;
+  name: string;
+  id: number | null;
+  character: number;
+  encounter: number | null;
 }
 
 export interface Encounter {
   name: string | null;
-  roster: Array<SavedCharacter | Character>;
+  roster: CharacterState[];
   currentTurn: number;
   id: null | number;
   surpriseRound: boolean;
@@ -133,11 +115,11 @@ export interface EncounterCreation {
 }
 
 export interface EncounterCreationProps {
-  npcs: Character[];
-  players: Character[];
+  npcs: CharacterState[];
+  players: CharacterState[];
   saveEncounter: (encounter: Encounter) => void;
   children?: any;
-  onCharSelect?: (char: Character, fromList: boolean) => void;
+  onCharSelect?: (char: CharacterState, fromList: boolean) => void;
   onChange: (field: string, value: number | string | boolean) => void;
 }
 
@@ -157,11 +139,8 @@ export interface EncounterListProps extends R.RouterState {
 }
 
 export interface ToolState {
-  turnOrder: TurnOrder;
   encounters: Array<Encounter>;
   characters: Array<SavedCharacter>;
-  activeEncounter: null | number;
-  activeTool: ToolChoice;
   isLoading: boolean;
   encounterPage: number;
   maxEncounterPage: number;
@@ -189,7 +168,6 @@ export interface AppState {
 }
 
 export interface EncounterTool extends Tool {
-  turnOrder: TurnOrder;
   id: null | number;
   currentTurn: number;
   surpriseRound: boolean;
@@ -203,18 +181,10 @@ export enum MenuOptions {
 
 type Condition = "prone" | "incapacitated" | "stunned" | "poisoned" | "defeaned" | "frightened" | "charmed" | "invisible" | "paralyzed" | "petrified" | "blinded"
 
-export interface CharacterStateUpdate {
-  id?: number | null;
-  characterstate?: number | null;
-  currentHitPoints: number;
-  readiedAction?: boolean;
-  conditions?: Condition[] | never[];
-}
-
 export interface EncounterUpdate {
   id: number;
   endOfRound: boolean;
-  roster: Array<CharacterStateUpdate>;
+  roster: CharacterState[];
 }
 
 
@@ -246,4 +216,24 @@ export enum ServerCode {
   RESOURCE_ADDED = 201,
   USER_ERROR = 400,
   // will add more later
+}
+
+export enum CharacterDetailState {
+  INACTIVE = 1,
+  EXPANDED = 2,
+  ACTIVE = 3
+}
+
+export interface CharacterStateProps {
+  viewState: CharacterDetailState;
+}
+
+
+export type EncounterFormState = {
+  players: CharacterState[];
+  npcs: CharacterState[];
+  openModal: boolean;
+  currentChar: null | number;
+  name: string | null;
+  surpriseRound: boolean;
 }

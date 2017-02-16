@@ -2,7 +2,6 @@ import {
   endRound,
   querySpells,
   addCharacter,
-  changeTool,
   saveEncounter,
   addCharactersToEncounter,
   updateHitPoints,
@@ -10,7 +9,7 @@ import {
   characterListInit,
   changeEncounterPage
 } from './actions';
-import { AppState, Character, ToolChoice, SavedCharacter, Encounter } from '../interfaces';
+import { AppState, Character, SavedCharacter, Encounter } from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState
@@ -44,14 +43,6 @@ export function characterListDispatch(dispatch: Dispatch): any {
 
     selectCharacter: (char: SavedCharacter): void => {
       // TODO
-    }
-  };
-}
-
-export function toolDispatch(dispatch: Dispatch): any {
-  return {
-    changeTool: (tool: ToolChoice) => {
-      dispatch(changeTool(tool));
     }
   };
 }

@@ -33,6 +33,15 @@ interface EncounterView extends Encounter {
   id: number;
   endRound: (id: number, endOfRound: boolean) => void;
 }
+//
+// function CharacterStateDetail(props: CharacterStateProps) {
+//   return (
+//     <div className='char-detail'>
+//       {/* character detail */}
+//     </div>
+//   );
+// }
+
 class EncounterDetail extends React.Component<EncounterView, DetailState> {
   constructor() {
     super();

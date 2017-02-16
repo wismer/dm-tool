@@ -12,23 +12,16 @@ import {
   Modal
 } from 'react-bootstrap';
 import { encounterDispatch } from '../redux/dispatchers';
-import { createEncounterProps } from '../redux/reducers/tools';
+import { createEncounterProps } from '../redux/reducers/encounter';
 import {
   EncounterCreationProps,
-  Character,
+  CharacterState,
   Encounter,
+  EncounterFormState,
 } from '../interfaces';
 import CharacterList from './CharacterList';
 
 
-type EncounterFormState = {
-  players: Character[];
-  npcs: Character[];
-  openModal: boolean;
-  currentChar: null | number;
-  name: string | null;
-  surpriseRound: boolean;
-}
 
 type EncounterDispatch = { saveEncounter: (encounter: Encounter) => void };
 
@@ -59,13 +52,13 @@ class CreateEncounterForm extends React.Component<EncounterCreationProps & Encou
     let { players, npcs, currentChar, name, surpriseRound } = this.state;
     this.setState({
       players: players.map(c => {
-        if (c.id === currentChar) {
+        if (c.character === currentChar) {
           c.initiativeRoll = n;
         }
         return c;
       }),
       npcs: npcs.map(c => {
-        if (c.id === currentChar) {
+        if (c.character === currentChar) {
           c.initiativeRoll = n;
         }
         return c;
@@ -76,7 +69,7 @@ class CreateEncounterForm extends React.Component<EncounterCreationProps & Encou
     });
   }
 
-  onCharSelect(char: Character, fromList: boolean) {
+  onCharSelect(char: CharacterState, fromList: boolean) {
     let {players, npcs, surpriseRound, name} = this.state;
     if (fromList && char.isNpc) {
       npcs = [...npcs, char];
