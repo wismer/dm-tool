@@ -46,8 +46,12 @@ export function saveCharacter<T, C>(character: C): Promise<T> {
   });
 }
 
-export function getCharacters<T>(): Promise<T> {
+export function getCharacters<T>(query?: string): Promise<T> {
   return new Promise((resolve, reject) => {
+    let url = 'http://localhost:8000/api/character/';
+    if (query) {
+      url += query;
+    }
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', () => {
       if (xhr.status === ServerCode.OK) {
@@ -56,7 +60,7 @@ export function getCharacters<T>(): Promise<T> {
         reject('FAILED');
       }
     });
-    xhr.open('GET', `http://localhost:8000/api/character/`);
+    xhr.open('GET', url);
     xhr.send();
   });
 }

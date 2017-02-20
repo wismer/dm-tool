@@ -7,13 +7,14 @@ import {
   Jumbotron,
   Button,
   Panel,
-  Row
+  Col,
 } from 'react-bootstrap';
-import CharacterList from './CharacterList';
+// import CharacterList from './CharacterList';
 import {
   Encounter,
+  CharacterState,
 } from '../interfaces';
-import { CharacterMap } from '../util';
+// import { CharacterMap } from '../util';
 /*
   1. hook up props
   2. hook up dispatchers (end turn, next turn, etc)
@@ -84,24 +85,23 @@ function EncounterDetailContainer(props: EncounterView & DetailState) {
         Add Characters to the Encounter
       </Button>
     </Jumbotron>
-  const currentChar = props.roster[props.activeIdx];
-  const roster = CharacterMap(props.roster).slice(props.activeIdx);
+  // const currentChar = props.roster[props.activeIdx];
+  // const roster = CharacterMap(props.roster).slice(props.activeIdx);
+  //
 
-
+  let roster = props.roster.map((c: CharacterState) => {
+    return (
+      <div className='char-state'>
+        <Col>{c.name}</Col>
+        <Col>{c.currentHitPoints}</Col>
+      </div>
+    );
+  });
   return (
     <div>
       {props.roster.length === 0 ? e : ''}
       <Panel>
-        <Row><CharacterList characters={roster.prev} activeIdx={-1} /></Row>
-        <Row>
-          <CharacterList characters={roster.current} activeIdx={0}>
-            <Row>
-              <Button onClick={() => props.alterHitPoints(-1, currentChar.id || 0, props.id)}>-</Button>
-              <Button onClick={() => props.alterHitPoints( 1, currentChar.id || 0, props.id)}>+</Button>
-            </Row>
-          </CharacterList>
-        </Row>
-        <Row><CharacterList characters={roster.next} activeIdx={-1}/></Row>
+        {roster}
       </Panel>
       <Button onClick={props.nextTurn}>
         Next Turn
@@ -109,5 +109,16 @@ function EncounterDetailContainer(props: EncounterView & DetailState) {
     </div>
   );
 }
+// {/*
+//   <Row><CharacterList characters={roster.prev} activeIdx={-1} /></Row>
+//   <Row>
+//     <CharacterList characters={roster.current} activeIdx={0}>
+//       <Row>
+//         <Button onClick={() => props.alterHitPoints(-1, currentChar.id || 0, props.id)}>-</Button>
+//         <Button onClick={() => props.alterHitPoints( 1, currentChar.id || 0, props.id)}>+</Button>
+//       </Row>
+//     </CharacterList>
+//   </Row>
+//   <Row><CharacterList characters={roster.next} activeIdx={-1}/></Row>*/}
 
 export default withRouter(connect(encounterDetailProps, encounterViewDispatch)(EncounterDetail));

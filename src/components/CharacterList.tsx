@@ -13,23 +13,11 @@ import {
   CharacterListDispatchProps
 } from '../interfaces';
 
-class CharacterList extends React.Component<CharacterListDispatchProps, undefined> {
-  componentDidMount() {
-    if (!this.props.children) {
-      this.props.fetchCharacters();
-    }
-  }
-
-  render() {
-    return <List {...this.props} />
-  }
-}
-
-const List = (props: any) => {
+const CharacterList = (props: CharacterListDispatchProps) => {
   const list = props.characters.map((c: SavedCharacter, i: number) => {
     let name = c.isNpc ? c.characterName : `${c.characterName} (${c.playerName})`;
     return (
-      <ListGroupItem onClick={() => props.selectCharacter(c)} key={i} active={i === props.activeIdx}>
+      <ListGroupItem onClick={() => (fromList: boolean) => props.onCharSelect(c, fromList)} key={i} active={i === props.activeIdx}>
         <Col xs={6}>{name}</Col>
         <Col xs={4}>HP: {c.maxHitPoints}</Col>
       </ListGroupItem>
@@ -39,7 +27,6 @@ const List = (props: any) => {
   return (
     <div className='character-list'>
       <ListGroup>{list}</ListGroup>
-      {props.children ? <Col xs={6}>{props.children}</Col> : ''}
     </div>
   );
 };

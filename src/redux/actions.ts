@@ -293,3 +293,11 @@ export function endRound(id: number, endOfRound: boolean) {
     });
   };
 }
+
+export const CHARACTER_SEARCH_RESULTS = 'CHARACTER_SEARCH_RESULTS';
+export function receiveSearchResults(results: SavedCharacter[]): any {
+  return {
+    characters: results,
+    type: CHARACTER_SEARCH_RESULTS
+  };
+}

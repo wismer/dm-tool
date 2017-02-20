@@ -21,6 +21,7 @@ import {
   END_ROUND_INIT,
   CHARACTER_LIST_LOAD,
   UPDATE_HIT_POINTS,
+  CHARACTER_SEARCH_RESULTS,
 } from '../actions';
 import { Character } from '../../interfaces';
 
@@ -129,6 +130,7 @@ export function tools(state: ToolState, action: any): ToolState {
     case FINISH_SAVE_CHARACTER_DM_TOOL:
       return addCharacterToList(state, action.character);
     case CHARACTER_LIST_LOAD:
+    case CHARACTER_SEARCH_RESULTS:
       return characterListLoad(state, action.characters);
     case SAVE_ENCOUNTER_INIT:
       return Object.assign({}, state, { isLoading: true }); // TODO
@@ -157,18 +159,8 @@ export function tools(state: ToolState, action: any): ToolState {
 }
 
 export function characterListProps(state: AppState, props: any): CharacterListProps {
-  let characters;
-
-  if (props.filter && props.filter === 'npcs') {
-    characters = state.tools.characters.filter(c => c.isNpc);
-  } else if (props.filter && props.filter === 'players') {
-    characters = state.tools.characters.filter(c => !c.isNpc);
-  } else {
-    characters = state.tools.characters;
-  }
-
   return {
-    characters,
+    characters: props.characters,
     activeIdx: props.activeIdx
   };
 }

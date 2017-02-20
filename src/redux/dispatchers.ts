@@ -7,7 +7,8 @@ import {
   updateHitPoints,
   retrieveEncounterData,
   characterListInit,
-  changeEncounterPage
+  changeEncounterPage,
+  receiveSearchResults
 } from './actions';
 import { AppState, Character, SavedCharacter, Encounter } from '../interfaces';
 
@@ -40,10 +41,6 @@ export function characterListDispatch(dispatch: Dispatch): any {
     fetchCharacters: () => {
       dispatch(characterListInit());
     },
-
-    selectCharacter: (char: SavedCharacter): void => {
-      // TODO
-    }
   };
 }
 
@@ -81,4 +78,12 @@ export function encounterViewDispatch(dispatch: Dispatch): any {
       dispatch(endRound(id, endOfRound))
     }
   }
+}
+
+export function characterQueryDispatch(dispatch: Dispatch): any {
+  return {
+    receiveSearchResults: (results: SavedCharacter[]) => {
+      dispatch(receiveSearchResults(results));
+    }
+  };
 }

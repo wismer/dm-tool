@@ -121,6 +121,7 @@ export interface EncounterCreationProps {
   children?: any;
   onCharSelect?: (char: CharacterState, fromList: boolean) => void;
   onChange: (field: string, value: number | string | boolean) => void;
+  characters: SavedCharacter[];
 }
 
 export type RouterLocation = {
@@ -192,11 +193,13 @@ export interface CharacterListProps {
   characters: SavedCharacter[];
   activeIdx: null | number;
   filter?: string;
+  empty?: boolean;
 };
 
 export interface CharacterListDispatchProps extends CharacterListProps {
   fetchCharacters: () => void;
-  selectCharacter: (char: SavedCharacter) => void;
+  selectCharacter: (char: SavedCharacter, fromList: boolean) => void;
+  onCharSelect: (char: SavedCharacter, fromList: boolean) => void;
 }
 
 export interface JSONListResponse<T> {
@@ -219,9 +222,11 @@ export enum ServerCode {
 }
 
 export enum CharacterDetailState {
-  INACTIVE = 1,
-  EXPANDED = 2,
-  ACTIVE = 3
+  INACTIVE,
+  ACTIVE,
+  EXPANDED = ACTIVE | INACTIVE,
+  READIED_ACTION = EXPANDED | INACTIVE,
+  DEAD = INACTIVE,
 }
 
 export interface CharacterStateProps {
@@ -236,4 +241,13 @@ export type EncounterFormState = {
   currentChar: null | number;
   name: string | null;
   surpriseRound: boolean;
+}
+
+export interface Query {
+  name: string;
+  npcsOnly: boolean;
+}
+
+export interface QueryProps {
+  receiveSearchResults: (results: SavedCharacter[]) => void;
 }

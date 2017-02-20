@@ -5,6 +5,7 @@ import {
   FormGroup,
   Checkbox,
   Col,
+  Row,
   Button,
   FormControl,
   ControlLabel,
@@ -19,6 +20,7 @@ import {
   Encounter,
   EncounterFormState,
 } from '../interfaces';
+import CharacterQuery from './CharacterQuery';
 import CharacterList from './CharacterList';
 
 
@@ -127,6 +129,9 @@ class CreateEncounterForm extends React.Component<EncounterCreationProps & Encou
             </Modal.Body>
           </Modal.Header>
         </Modal>
+
+        <CharacterList characters={npcs} onCharSelect={this.onCharSelect.bind(this, false)} />
+        <CharacterList characters={players} onCharSelect={this.onCharSelect.bind(this, false)} />
       </CreateEncounterContainer>
     );
   }
@@ -136,28 +141,34 @@ function CreateEncounterContainer(props: EncounterCreationProps) {
   return (
     <div>
       <Col xs={8}>
-        <Form horizontal>
-          <FormGroup controlId='encounterName'>
-            <Col componentClass={ControlLabel} sm={4}>
-              Encounter Name
-            </Col>
-            <Col sm={8}>
-              <FormControl onChange={(e: any) => props.onChange('name', e.target.value)} type="text" placeholder="Name for Encounter" />
-            </Col>
-          </FormGroup>
-          <FormGroup controlId='surpriseRound'>
-            <Col componentClass={ControlLabel} sm={4}>
-              Surprise Round?
-            </Col>
-            <Col sm={8}>
-              <Checkbox onClick={(e: any) => props.onChange('surpriseRound', e.target.checked)} />
-            </Col>
-          </FormGroup>
-        </Form>
-        {props.children}
-      </Col>
+        <Row>
+          <Form horizontal>
+            <FormGroup controlId='encounterName'>
+              <Col componentClass={ControlLabel} sm={4}>
+                Encounter Name
+              </Col>
+              <Col sm={8}>
+                <FormControl onChange={(e: any) => props.onChange('name', e.target.value)} type="text" placeholder="Name for Encounter" />
+              </Col>
+            </FormGroup>
+            <FormGroup controlId='surpriseRound'>
+              <Col componentClass={ControlLabel} sm={4}>
+                Surprise Round?
+              </Col>
+              <Col sm={8}>
+                <Checkbox onClick={(e: any) => props.onChange('surpriseRound', e.target.checked)} />
+              </Col>
+            </FormGroup>
+          </Form>
+          </Row>
+          <Row>
+            {props.children}
+          </Row>
+        </Col>
+
       <Col xs={4}>
-        <CharacterList filter='players' />
+        <CharacterQuery />
+        <CharacterList characters={props.characters} onCharSelect={props.onCharSelect} />
       </Col>
     </div>
   );

@@ -53,6 +53,8 @@ export function createEncounterProps(state: AppState, props: any): EncounterCrea
     players,
     npcs,
     saveEncounter: props.saveEncounter,
+    characters: tools.characters,
     onChange: props.onChange,
+    onCharSelect: props.onCharSelect
   };
 }
