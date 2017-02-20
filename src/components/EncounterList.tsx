@@ -10,7 +10,7 @@ import {
   Pagination,
 } from 'react-bootstrap';
 import { withRouter } from 'react-router';
-import { encounterListProps } from '../redux/reducers/tools';
+import { encounterListProps } from '../redux/reducers/encounter';
 import { encounterListDispatch } from '../redux/dispatchers';
 /*
 ENCOUNTER

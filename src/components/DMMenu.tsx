@@ -6,9 +6,9 @@ import {
 
 const DMMenu = (props: any) => {
   return (
-    <Nav bsStyle="pills" stacked activeKey={props.activeTool}>
+    <Nav bsStyle="pills" stacked>
       <li role='presentation'>
-        <Link role='button' to='dm-tools/create-encounter/'>Create Encounter</Link>
+        <Link to='dm-tools/create-encounter/'>Create Encounter</Link>
       </li>
       <li role='presentation'>
         <Link to='dm-tools/spells/'>Spellbook</Link>

@@ -2,15 +2,15 @@ import {
   endRound,
   querySpells,
   addCharacter,
-  changeTool,
   saveEncounter,
   addCharactersToEncounter,
   updateHitPoints,
   retrieveEncounterData,
   characterListInit,
-  changeEncounterPage
+  changeEncounterPage,
+  receiveSearchResults
 } from './actions';
-import { AppState, Character, ToolChoice, SavedCharacter, Encounter } from '../interfaces';
+import { AppState, Character, SavedCharacter, Encounter } from '../interfaces';
 
 interface Dispatch {
   (action: any): AppState
@@ -41,18 +41,6 @@ export function characterListDispatch(dispatch: Dispatch): any {
     fetchCharacters: () => {
       dispatch(characterListInit());
     },
-
-    selectCharacter: (char: SavedCharacter): void => {
-      // TODO
-    }
-  };
-}
-
-export function toolDispatch(dispatch: Dispatch): any {
-  return {
-    changeTool: (tool: ToolChoice) => {
-      dispatch(changeTool(tool));
-    }
   };
 }
 
@@ -90,4 +78,12 @@ export function encounterViewDispatch(dispatch: Dispatch): any {
       dispatch(endRound(id, endOfRound))
     }
   }
+}
+
+export function characterQueryDispatch(dispatch: Dispatch): any {
+  return {
+    receiveSearchResults: (results: SavedCharacter[]) => {
+      dispatch(receiveSearchResults(results));
+    }
+  };
 }

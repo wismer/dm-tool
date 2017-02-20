@@ -1,10 +1,8 @@
 import {
   ToolState,
-  ToolChoice,
-  TurnOrder,
   AppState,
-  EncounterListProps,
   CharacterListProps,
+  CharacterState,
   SavedCharacter,
   Encounter
  } from '../../interfaces';
@@ -21,41 +19,24 @@ import {
   SWITCH_ACTIVE_ENCOUNTER,
   END_ROUND_FINISH,
   END_ROUND_INIT,
-  CHANGE_TOOL,
   CHARACTER_LIST_LOAD,
   UPDATE_HIT_POINTS,
+  CHARACTER_SEARCH_RESULTS,
 } from '../actions';
-import {
-  CharacterMap
-} from '../../util';
-import { Character, EncounterCreationProps } from '../../interfaces';
-
-const initialTool: TurnOrder = {
-  players: [],
-  enemies: [],
-  order: [],
-  name: 'Turn Order'
-};
+import { Character } from '../../interfaces';
 
 const initialState: ToolState = {
   encounterPage: 1,
   maxEncounterPage: 1,
-  turnOrder: initialTool,
   isLoading: false,
-  activeTool: 1,
   encounters: [],
   characters: [],
-  activeEncounter: null
 };
 
 function addCharacterToList(state: ToolState, character: SavedCharacter): ToolState {
   return Object.assign({}, state, {
     characters: [...state.characters, character]
   });
-}
-
-function changeTool(state: ToolState, tool: ToolChoice): ToolState {
-  return Object.assign({}, state, { activeTool: tool });
 }
 
 function addEncounter(state: ToolState, encounter: Encounter) {
@@ -99,7 +80,7 @@ function characterListLoad(state: ToolState, characters: SavedCharacter[]): Tool
   return Object.assign({}, state, { characters });
 }
 
-function updateEncounterRoster(roster: Character[], charID: number, hp: number): Character[] {
+function updateEncounterRoster(roster: CharacterState[], charID: number, hp: number): CharacterState[] {
   return roster.map(c => {
     if (c.id === charID) {
       c.currentHitPoints += hp;
@@ -148,9 +129,8 @@ export function tools(state: ToolState, action: any): ToolState {
   switch (action.type) {
     case FINISH_SAVE_CHARACTER_DM_TOOL:
       return addCharacterToList(state, action.character);
-    case CHANGE_TOOL:
-      return changeTool(state, action.tool);
     case CHARACTER_LIST_LOAD:
+    case CHARACTER_SEARCH_RESULTS:
       return characterListLoad(state, action.characters);
     case SAVE_ENCOUNTER_INIT:
       return Object.assign({}, state, { isLoading: true }); // TODO
@@ -179,52 +159,12 @@ export function tools(state: ToolState, action: any): ToolState {
 }
 
 export function characterListProps(state: AppState, props: any): CharacterListProps {
-  let characters;
-
-  if (props.filter && props.filter === 'npcs') {
-    characters = state.tools.characters.filter(c => c.isNpc);
-  } else if (props.filter && props.filter === 'players') {
-    characters = state.tools.characters.filter(c => !c.isNpc);
-  } else {
-    characters = state.tools.characters;
-  }
-
   return {
-    characters,
+    characters: props.characters,
     activeIdx: props.activeIdx
   };
 }
 
 export function addCharacterProps(state: AppState, props: any): {isOpen: boolean} {
   return props;
-}
-
-/* ENCOUNTER */
-
-export function encounterListProps(state: AppState, props: any): EncounterListProps {
-  const { tools } = state;
-  return {
-    ...props,
-    encounters: tools.encounters,
-    activeEncounter: tools.activeEncounter,
-    activePage: tools.encounterPage,
-    maxPage: tools.maxEncounterPage,
-  };
-}
-
-export function encounterViewProps(state: AppState, props: any): Encounter {
-  const { id } = props.params;
-  return state.tools.encounters.find(e => `${e.id}` === id) || state.tools.encounters[0]
-}
-
-export function createEncounterProps(state: AppState, props: any): EncounterCreationProps {
-  const { tools } = state;
-  const { players, npcs } = CharacterMap(tools.characters).split();
-  return {
-    children: props.children,
-    players,
-    npcs,
-    saveEncounter: props.saveEncounter,
-    onChange: props.onChange,
-  };
 }

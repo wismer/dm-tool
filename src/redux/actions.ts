@@ -2,7 +2,6 @@ import {
   AppState,
   SavedCharacter,
   Character,
-  ToolChoice,
   Encounter,
   EncounterUpdate
 } from '../interfaces';
@@ -32,15 +31,6 @@ export const SPELL_QUERY_REQUEST = 'SPELL_QUERY_REQUEST';
 function spellQueryRequest(): any {
   return {
     type: SPELL_QUERY_REQUEST,
-  };
-}
-
-export const CHANGE_TOOL = 'CHANGE_TOOL';
-
-export function changeTool(tool: ToolChoice): any {
-  return {
-    type: CHANGE_TOOL,
-    tool
   };
 }
 
@@ -127,22 +117,6 @@ export function saveEncounter(encounter: Encounter): AppUpdate {
     api.saveEncounter(encounter).then((data: string) => {
       dispatch(saveEncounterFinish(data))
     });
-    // const { tools } = getState();
-    // const { enemies, players, name, surpriseRound } = tools.createEncounter;
-    // const roster = enemies.concat(players).map(c => ({id: c.id, count: c.count || 1, intiativeRoll: c.initiativeRoll}))
-    // let encounter = {
-    //   roster,
-    //   name,
-    //   surpriseRound
-    // };
-    // dispatch(saveEncounterInit());
-    // let xhr: XMLHttpRequest = new XMLHttpRequest();
-    // xhr.addEventListener('loadend', (response) => {
-    //   dispatch(saveEncounterFinish(response));
-    // });
-    // xhr.open('POST', `http://localhost:8000/api/encounter/`);
-    // xhr.setRequestHeader('Content-Type', 'application/json');
-    // xhr.send(JSON.stringify(encounter));
   };
 }
 
@@ -311,18 +285,19 @@ export function endRound(id: number, endOfRound: boolean) {
     let data: EncounterUpdate = {
       id,
       endOfRound,
-      roster: encounter.roster.map(c => {
-        return {
-          id: c.id,
-          characterstate: c.id,
-          readiedAction: false,
-          currentHitPoints: c.currentHitPoints || 0
-        };
-      })
+      roster: encounter.roster
     };
 
     api.endEncounterRound(data).then((response: string) => {
       dispatch(endRoundFinish(JSON.parse(response)))
     });
+  };
+}
+
+export const CHARACTER_SEARCH_RESULTS = 'CHARACTER_SEARCH_RESULTS';
+export function receiveSearchResults(results: SavedCharacter[]): any {
+  return {
+    characters: results,
+    type: CHARACTER_SEARCH_RESULTS
   };
 }

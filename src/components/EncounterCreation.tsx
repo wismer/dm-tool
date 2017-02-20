@@ -5,6 +5,7 @@ import {
   FormGroup,
   Checkbox,
   Col,
+  Row,
   Button,
   FormControl,
   ControlLabel,
@@ -12,23 +13,17 @@ import {
   Modal
 } from 'react-bootstrap';
 import { encounterDispatch } from '../redux/dispatchers';
-import { createEncounterProps } from '../redux/reducers/tools';
+import { createEncounterProps } from '../redux/reducers/encounter';
 import {
   EncounterCreationProps,
-  Character,
+  CharacterState,
   Encounter,
+  EncounterFormState,
 } from '../interfaces';
+import CharacterQuery from './CharacterQuery';
 import CharacterList from './CharacterList';
 
 
-type EncounterFormState = {
-  players: Character[];
-  npcs: Character[];
-  openModal: boolean;
-  currentChar: null | number;
-  name: string | null;
-  surpriseRound: boolean;
-}
 
 type EncounterDispatch = { saveEncounter: (encounter: Encounter) => void };
 
@@ -59,13 +54,13 @@ class CreateEncounterForm extends React.Component<EncounterCreationProps & Encou
     let { players, npcs, currentChar, name, surpriseRound } = this.state;
     this.setState({
       players: players.map(c => {
-        if (c.id === currentChar) {
+        if (c.character === currentChar) {
           c.initiativeRoll = n;
         }
         return c;
       }),
       npcs: npcs.map(c => {
-        if (c.id === currentChar) {
+        if (c.character === currentChar) {
           c.initiativeRoll = n;
         }
         return c;
@@ -76,7 +71,7 @@ class CreateEncounterForm extends React.Component<EncounterCreationProps & Encou
     });
   }
 
-  onCharSelect(char: Character, fromList: boolean) {
+  onCharSelect(char: CharacterState, fromList: boolean) {
     let {players, npcs, surpriseRound, name} = this.state;
     if (fromList && char.isNpc) {
       npcs = [...npcs, char];
@@ -134,6 +129,9 @@ class CreateEncounterForm extends React.Component<EncounterCreationProps & Encou
             </Modal.Body>
           </Modal.Header>
         </Modal>
+
+        <CharacterList characters={npcs} onCharSelect={this.onCharSelect.bind(this, false)} />
+        <CharacterList characters={players} onCharSelect={this.onCharSelect.bind(this, false)} />
       </CreateEncounterContainer>
     );
   }
@@ -143,28 +141,34 @@ function CreateEncounterContainer(props: EncounterCreationProps) {
   return (
     <div>
       <Col xs={8}>
-        <Form horizontal>
-          <FormGroup controlId='encounterName'>
-            <Col componentClass={ControlLabel} sm={4}>
-              Encounter Name
-            </Col>
-            <Col sm={8}>
-              <FormControl onChange={(e: any) => props.onChange('name', e.target.value)} type="text" placeholder="Name for Encounter" />
-            </Col>
-          </FormGroup>
-          <FormGroup controlId='surpriseRound'>
-            <Col componentClass={ControlLabel} sm={4}>
-              Surprise Round?
-            </Col>
-            <Col sm={8}>
-              <Checkbox onClick={(e: any) => props.onChange('surpriseRound', e.target.checked)} />
-            </Col>
-          </FormGroup>
-        </Form>
-        {props.children}
-      </Col>
+        <Row>
+          <Form horizontal>
+            <FormGroup controlId='encounterName'>
+              <Col componentClass={ControlLabel} sm={4}>
+                Encounter Name
+              </Col>
+              <Col sm={8}>
+                <FormControl onChange={(e: any) => props.onChange('name', e.target.value)} type="text" placeholder="Name for Encounter" />
+              </Col>
+            </FormGroup>
+            <FormGroup controlId='surpriseRound'>
+              <Col componentClass={ControlLabel} sm={4}>
+                Surprise Round?
+              </Col>
+              <Col sm={8}>
+                <Checkbox onClick={(e: any) => props.onChange('surpriseRound', e.target.checked)} />
+              </Col>
+            </FormGroup>
+          </Form>
+          </Row>
+          <Row>
+            {props.children}
+          </Row>
+        </Col>
+
       <Col xs={4}>
-        <CharacterList filter='players' />
+        <CharacterQuery />
+        <CharacterList characters={props.characters} onCharSelect={props.onCharSelect} />
       </Col>
     </div>
   );

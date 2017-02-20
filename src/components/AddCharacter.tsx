@@ -22,13 +22,11 @@ class AddCharacterContainer extends React.Component<CreateCharacterProps, Create
       character: {
         playerName: '',
         characterName: '',
-        id: null,
+        id: 0,
         armorClass: 8,
         toHit: 2,
         passiveWisdom: 8,
         initiative: 8,
-        conditions: [],
-        currentHitPoints: 8,
         maxHitPoints: 8,
         isNpc: false
       },
@@ -43,13 +41,11 @@ class AddCharacterContainer extends React.Component<CreateCharacterProps, Create
         character: {
           playerName: '',
           characterName: '',
-          id: null,
+          id: 0,
           armorClass: 8,
           toHit: 2,
           passiveWisdom: 8,
           initiative: 8,
-          conditions: [],
-          currentHitPoints: 8,
           maxHitPoints: 8,
           isNpc: false
         }
@@ -124,16 +120,6 @@ class AddCharacterContainer extends React.Component<CreateCharacterProps, Create
 
             <Col sm={4}>
               <FormControl onChange={this.handleChange} value={character.initiative} type="text" placeholder="Initiative" />
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId='currentHitPoints'>
-            <Col componentClass={ControlLabel} sm={4}>
-              Current Hit Points
-            </Col>
-
-            <Col sm={4}>
-              <FormControl onChange={this.handleChange} value={character.currentHitPoints} type="text" placeholder="Hit Points" />
             </Col>
           </FormGroup>
 
