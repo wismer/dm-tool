@@ -182,19 +182,18 @@ function encounterDetailLoad(encounter: Encounter): any {
     encounter
   };
 }
-
-export const LOAD_ENCOUNTERS_INIT = 'LOAD_ENCOUNTERS_INIT';
-function loadEncountersInit(): any {
-  return {
-    type: LOAD_ENCOUNTERS_INIT,
-  };
-}
+// REPLACE ME TODO
+// export const LOAD_ENCOUNTERS_INIT = 'LOAD_ENCOUNTERS_INIT';
+// function loadEncountersInit(): any {
+//   return {
+//     type: LOAD_ENCOUNTERS_INIT,
+//   };
+// }
 
 export function retrieveEncounterData(location: ReactRouter.RouterState, params: { id?: string }): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    let { tools } = getState();
-    dispatch(loadEncountersInit());
-    api.getEncounters(location, params, tools.encounterPage).then((payload: any) => {
+    let { encounter: encounterState } = getState();
+    api.getEncounters(location, params, encounterState.page).then((payload: any) => {
       if (payload.results) {
         dispatch(encounterStateLoad(payload.results, payload.count))
       } else {
@@ -277,11 +276,12 @@ function endRoundFinish(data: any): any {
 
 export function endRound(id: number, endOfRound: boolean) {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    let { tools } = getState();
-    let encounter = tools.encounters.find((e: Encounter) => e.id === id);
-    if (!encounter) {
+    let { encounter: encounterState } = getState();
+    let encounterID = encounterState.encounters.find(e => e === id);
+    if (!encounterID) {
       return;
     }
+    let encounter = encounterState.encountersById[encounterID];
     let data: EncounterUpdate = {
       id,
       endOfRound,

@@ -1,6 +1,7 @@
 import {
   AppState,
   SavedCharacter,
+  CharState,
  } from '../../interfaces';
 import {
   SAVE_CHARACTER,
@@ -8,10 +9,6 @@ import {
   CHARACTER_SEARCH_RESULTS,
 } from '../actions';
 
-interface CharState {
-  characters: number[];
-  charactersById: { [id: string]: SavedCharacter };
-}
 
 const initialState: CharState = {
   characters: [],

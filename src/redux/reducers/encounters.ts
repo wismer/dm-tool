@@ -1,4 +1,4 @@
-import { Encounter, CharacterState } from '../../interfaces';
+import { Encounter, EncounterState } from '../../interfaces';
 import {
   SAVE_ENCOUNTER_FINISH,
   SAVE_ENCOUNTER_INIT,
@@ -8,25 +8,22 @@ import {
   ENCOUNTER_STATE_LOAD,
   ENCOUNTER_DETAIL_LOAD,
 } from '../actions';
-interface EncounterState {
-  encounters: number[],
-  encountersById: { [id: number]: Encounter },
-  characterStates: number[],
-  characterStatesById: { [id: number]: CharacterState }
-}
+import { wrapPayload } from '../../util';
 
 const initialEncounterState = {
   encounters: [],
   encountersById: {},
   characterStates: [],
   characterStatesById: {},
+  page: 1
 };
 
 
-export default function encounter(state: EncounterState, action: any): EncounterState {
+export function encounter(state: EncounterState, action: any): EncounterState {
   if (!state) {
     return initialEncounterState;
   }
+
   switch (action.type) {
     case SAVE_ENCOUNTER_INIT:
       return Object.assign({}, state, { isLoading: true }); // TODO
@@ -50,11 +47,11 @@ function addEncounter(state: EncounterState, encounter: Encounter) {
   return state; // TODO
 }
 
-function loadEncounters(state: EncounterState, encounters: Encounter[], maxEncounterPage: number): EncounterState {
+function loadEncounters(state: EncounterState, encounters: Encounter[], page: number): EncounterState {
+  const deserialized = wrapPayload(encounters, 'encounters');
   return Object.assign({}, state, {
-    maxEncounterPage,
-    encounters,
-    isLoading: false
+    page,
+    ...deserialized
   });
 }
 

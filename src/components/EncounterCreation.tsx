@@ -22,31 +22,31 @@ import {
 } from '../interfaces';
 import CharacterQuery from './CharacterQuery';
 import CharacterList from './CharacterList';
-import { CharacterMap } from '../util';
+// import { CharacterMap } from '../util';
 
 
 function createEncounterProps(state: AppState, props: any): EncounterCreationProps {
-  const { tools } = state;
-  const characters = tools.characters.map(c => {
-    return {
-      ...c,
-      conditions: [],
-      readiedAction: false,
-      name: `${c.characterName} (${c.playerName})`,
-      encounter: null,
-      character: c.id,
-      initiativeRoll: 0,
-      wasSurprised: false,
-      currentHitPoints: c.maxHitPoints,
-    };
-  });
-  const { players, npcs } = CharacterMap(characters).split();
+  // const { encounter } = state;
+  // const characters = encounter.characters.map(c => {
+  //   return {
+  //     ...c,
+  //     conditions: [],
+  //     readiedAction: false,
+  //     name: `${c.characterName} (${c.playerName})`,
+  //     encounter: null,
+  //     character: c.id,
+  //     initiativeRoll: 0,
+  //     wasSurprised: false,
+  //     currentHitPoints: c.maxHitPoints,
+  //   };
+  // });
+  // const { players, npcs } = CharacterMap(characters).split();
   return {
     children: props.children,
-    players,
-    npcs,
+    players: [],
+    npcs: [],
     saveEncounter: props.saveEncounter,
-    characters: tools.characters,
+    characters: [],
     onChange: props.onChange,
     onCharSelect: props.onCharSelect
   };
@@ -132,7 +132,7 @@ class CreateEncounterForm extends React.Component<EncounterCreationProps & Encou
       name,
       roster: npcs.concat(players),
       currentTurn: 1,
-      id: null,
+      id: 0, // FIXME
       surpriseRound
     });
   }

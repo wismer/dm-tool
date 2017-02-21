@@ -43,12 +43,10 @@ ENCOUNTER
 */
 
 function encounterListProps(state: AppState, props: any): EncounterListProps {
-  const { tools } = state;
+  const { encounters, encountersById } = state.encounter;
   return {
     ...props,
-    encounters: tools.encounters,
-    activePage: tools.encounterPage,
-    maxPage: tools.maxEncounterPage,
+    encounters: encounters.map(id => encountersById[id]),
   };
 }
 
@@ -72,12 +70,6 @@ class EncounterListContainer extends React.Component<ListProps, EncounterListSta
 
   fetchData() {
     this.props.retrieveEncounterData(this.props.location, this.props.params);
-  }
-
-  componentWillReceiveProps(nextProps: ListProps) {
-    if (nextProps.activePage !== this.props.activePage) {
-      this.fetchData();
-    }
   }
 
   render() {

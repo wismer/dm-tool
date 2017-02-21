@@ -91,7 +91,7 @@ export interface Encounter {
   name: string | null;
   roster: CharacterState[];
   currentTurn: number;
-  id: null | number;
+  id: number;
   surpriseRound: boolean;
   created?: Date
 }
@@ -134,9 +134,6 @@ export type RouterLocation = {
 
 export interface EncounterListProps extends R.RouterState {
   encounters: Array<Encounter>;
-  activeEncounter: null | number;
-  activePage: number;
-  maxPage: number;
 }
 
 export interface ToolState {
@@ -162,10 +159,24 @@ export interface RaceState {
   races: Array<Race>;
 }
 
+export interface EncounterState {
+  encounters: number[];
+  encountersById: { [id: number]: Encounter };
+  characterStates: number[];
+  characterStatesById: { [id: number]: CharacterState };
+  page: number;
+}
+
 export interface AppState {
   race: RaceState;
-  tools: ToolState;
   spells: SpellList;
+  encounter: EncounterState;
+  character: CharState
+}
+
+export interface CharState {
+  characters: number[];
+  charactersById: { [id: string]: SavedCharacter };
 }
 
 export interface EncounterTool extends Tool {

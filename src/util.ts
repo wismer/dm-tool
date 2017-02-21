@@ -43,3 +43,28 @@ export function CharacterMap(characters: CharacterState[]) {
     }
   };
 }
+
+interface PayloadItem {
+  id: number;
+}
+
+interface SerializedPayload<T> {
+  [index: number]: T;
+}
+
+interface NormalizedPayload<T> {
+  charactersById?: SerializedPayload<T>;
+  characters?: number[];
+  encountersById?: SerializedPayload<T>
+  encounters?: number[];
+}
+
+export function wrapPayload<T extends PayloadItem, R>(payload: T[], key: string): NormalizedPayload<R> {
+  return {
+    [`${key}ById`]: payload.reduce((prev: NormalizedPayload<R>, next: T) => {
+      prev[next.id] = next;
+      return prev;
+    }, {}),
+    [key]: payload.map((item: T) => item.id)
+  };
+}
