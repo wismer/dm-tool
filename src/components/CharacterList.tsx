@@ -5,13 +5,20 @@ import {
   ListGroupItem,
   ListGroup,
 } from 'react-bootstrap';
-// import AddCharacter from './AddCharacter';
 import { SavedCharacter } from '../interfaces';
 import { characterListDispatch } from '../redux/dispatchers';
-import { characterListProps } from '../redux/reducers/tools';
 import {
-  CharacterListDispatchProps
+  CharacterListDispatchProps,
+  CharacterListProps,
+  AppState,
 } from '../interfaces';
+
+function characterListProps(state: AppState, props: any): CharacterListProps {
+  return {
+    characters: props.characters,
+    activeIdx: props.activeIdx
+  };
+}
 
 const CharacterList = (props: CharacterListDispatchProps) => {
   const list = props.characters.map((c: SavedCharacter, i: number) => {

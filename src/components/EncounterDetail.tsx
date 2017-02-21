@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { encounterDetailProps } from '../redux/reducers/encounter';
 import { encounterViewDispatch } from '../redux/dispatchers';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
@@ -13,6 +12,7 @@ import {
 import {
   Encounter,
   CharacterState,
+  AppState,
 } from '../interfaces';
 // import { CharacterMap } from '../util';
 /*
@@ -24,8 +24,17 @@ import {
 
 type DetailState = {
   activeIdx: number;
-
 };
+
+function encounterDetailProps(state: AppState, prevProps?: any): Encounter {
+  if (prevProps.params && prevProps.params.id) {
+    let encounter = state.tools.encounters.find(e => `${e.id}` === prevProps.params.id);
+    if (encounter) {
+      return encounter;
+    }
+  }
+  return state.tools.encounters[0];
+}
 
 
 interface EncounterView extends Encounter {

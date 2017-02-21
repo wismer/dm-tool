@@ -13,16 +13,44 @@ import {
   Modal
 } from 'react-bootstrap';
 import { encounterDispatch } from '../redux/dispatchers';
-import { createEncounterProps } from '../redux/reducers/encounter';
 import {
   EncounterCreationProps,
+  AppState,
   CharacterState,
   Encounter,
   EncounterFormState,
 } from '../interfaces';
 import CharacterQuery from './CharacterQuery';
 import CharacterList from './CharacterList';
+import { CharacterMap } from '../util';
 
+
+function createEncounterProps(state: AppState, props: any): EncounterCreationProps {
+  const { tools } = state;
+  const characters = tools.characters.map(c => {
+    return {
+      ...c,
+      conditions: [],
+      readiedAction: false,
+      name: `${c.characterName} (${c.playerName})`,
+      encounter: null,
+      character: c.id,
+      initiativeRoll: 0,
+      wasSurprised: false,
+      currentHitPoints: c.maxHitPoints,
+    };
+  });
+  const { players, npcs } = CharacterMap(characters).split();
+  return {
+    children: props.children,
+    players,
+    npcs,
+    saveEncounter: props.saveEncounter,
+    characters: tools.characters,
+    onChange: props.onChange,
+    onCharSelect: props.onCharSelect
+  };
+}
 
 
 type EncounterDispatch = { saveEncounter: (encounter: Encounter) => void };
