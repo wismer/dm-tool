@@ -1,4 +1,5 @@
 import * as R from '@types/react-router';
+import { Action } from 'redux';
 
 export enum SpellComponent {
   Verbal = 1,
@@ -21,16 +22,26 @@ export interface Spell {
   level: number;
 }
 
+type SpellSchool = 'necromancy' | 'evocation' | 'divine' | 'illusion' // add more later
+
 export interface SpellList {
-  searchResults: Array<Spell>;
-  spellSchools: Array<string>;
-  spellQuery: null | string;
-  isLoading: boolean;
-  didErr: boolean;
+  spellsById: Spell[];
+  spells: number[];
+  spellSchools: SpellSchool[];
+  spellQuery: string;
 }
 
-export interface Tool {
-  name: string;
+export interface SpellAction extends Action {
+  spells: Spell[];
+}
+
+export interface SpellSearchResults {
+  results: Spell[];
+  querySpellName: (query: string) => void;
+}
+
+export interface FormState {
+  query: string;
 }
 
 /*
@@ -177,12 +188,6 @@ export interface AppState {
 export interface CharState {
   characters: number[];
   charactersById: { [id: string]: SavedCharacter };
-}
-
-export interface EncounterTool extends Tool {
-  id: null | number;
-  currentTurn: number;
-  surpriseRound: boolean;
 }
 
 export enum MenuOptions {

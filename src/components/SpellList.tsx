@@ -1,30 +1,19 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Form, FormGroup, FormControl, Col, Row, Panel } from 'react-bootstrap';
-import { AppState, SpellList, Spell } from '../interfaces';
+import { AppState, SpellSearchResults, Spell, FormState } from '../interfaces';
 import { spellListDispatchers } from '../redux/dispatchers';
 
-interface SpellResults extends SpellList {
-  querySpellName: (name: string) => void;
-}
-
-interface FormState {
-  query: string;
-}
-
-function spellProps(props: AppState): SpellList {
-  return props.spells;
+function spellProps(state: AppState, props: any): SpellSearchResults {
+  const { spells: spellState } = state;
+  return {
+    results: spellState.spells.map(id => spellState.spellsById[id]),
+    querySpellName: props.querySpellName
+  };
 }
 
 
 const SpellListResult = (props: { spell: Spell }) => {
-  // const comps: string = props.spell.components.map(s => {
-  //   switch (s) {
-  //     case 1: return 'V';
-  //     case 2: return 'S';
-  //     default: return 'M';
-  //   }
-  // }).join(' ');
   return (
     <Panel header={props.spell.name} className='spell-result'>
       <p>{props.spell.desc}</p>
@@ -41,8 +30,8 @@ const SpellListResult = (props: { spell: Spell }) => {
   );
 }
 
-class SpellListContainer extends React.Component<SpellResults, FormState> {
-  constructor(props: SpellResults) {
+class SpellListContainer extends React.Component<SpellSearchResults, FormState> {
+  constructor(props: SpellSearchResults) {
     super(props);
     this.state = {
       query: ''
@@ -61,7 +50,7 @@ class SpellListContainer extends React.Component<SpellResults, FormState> {
   }
 
   render() {
-    const spellResults = this.props.searchResults.map((e, i) => <SpellListResult key={i} spell={e} />);
+    const spellResults = this.props.results.map((e, i) => <SpellListResult key={i} spell={e} />);
     return (
       <div className='spell-list'>
         <Form horizontal>

@@ -1,27 +1,26 @@
-import { Action } from 'redux';
-import { SpellList } from '../../interfaces';
+import { SpellList, Spell } from '../../interfaces';
 import { SPELL_QUERY_RESPONSE, SPELL_QUERY_REQUEST } from '../actions';
+import { wrapPayload } from '../../util';
 
 const initialState: SpellList = {
-  searchResults: [],
-  spellSchools: [],
-  spellQuery: null,
-  isLoading: false,
-  didErr: false,
+  spellsById: [],
+  spells: [],
+  spellSchools: ['evocation', 'necromancy'],
+  spellQuery: '',
 };
 
 function querySpells(state: SpellList): SpellList {
   return Object.assign({}, state, { isLoading: true });
 }
 
-function handleQueryResponse(state: SpellList, action: any): SpellList {
+function handleQueryResponse(state: SpellList, spells: Spell[]): SpellList {
+  const deserialized = wrapPayload(spells, 'spells');
   return Object.assign({}, state, {
-    searchResults: action.spells,
-    isLoading: false
+    ...deserialized,
   });
 }
 
-export function spells(state: SpellList, action: Action): SpellList {
+export function spells(state: SpellList, action: any): SpellList {
   if (!state) {
     return initialState;
   }
@@ -30,7 +29,7 @@ export function spells(state: SpellList, action: Action): SpellList {
     case SPELL_QUERY_REQUEST:
       return querySpells(state);
     case SPELL_QUERY_RESPONSE:
-      return handleQueryResponse(state, action);
+      return handleQueryResponse(state, action.spells);
   }
   return state;
 }
