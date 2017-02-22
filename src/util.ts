@@ -68,3 +68,17 @@ export function wrapPayload<T extends PayloadItem, R>(payload: T[], key: string)
     [key]: payload.map((item: T) => item.id)
   };
 }
+
+interface Resource {
+  name?: string;
+}
+
+export function fetchLocally<T extends Resource>(key: string, query: string): {results: T[]} | void {
+  const data = localStorage.getItem(key);
+  if (data) {
+    let payload = JSON.parse(data);
+    return {
+      results: payload.results.filter((c: T) => new RegExp(query, 'i').exec(c.name || ''))
+    };
+  }
+}

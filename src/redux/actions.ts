@@ -3,7 +3,8 @@ import {
   SavedCharacter,
   Character,
   Encounter,
-  EncounterUpdate
+  EncounterUpdate,
+  Spell
 } from '../interfaces';
 
 import * as api from '../api';
@@ -18,21 +19,14 @@ export const REFRESH_ENCOUNTERS = 'REFRESH_ENCOUNTERS';
 
 export const SPELL_QUERY_RESPONSE = 'SPELL_QUERY_RESPONSE';
 
-function spellQueryResponse(response: any): any {
-  let data = JSON.parse(response.target.responseText);
+function spellQueryResponse(spells: Spell[]): any {
   return {
     type: SPELL_QUERY_RESPONSE,
-    spells: data.results,
-  }
+    spells
+  };
 }
 
 export const SPELL_QUERY_REQUEST = 'SPELL_QUERY_REQUEST';
-
-function spellQueryRequest(): any {
-  return {
-    type: SPELL_QUERY_REQUEST,
-  };
-}
 
 export const INIT_SAVE_CHARACTER_DM_TOOL = 'INIT_SAVE_CHARACTER_DM_TOOL';
 
@@ -151,16 +145,11 @@ export const UPDATE_INITIATIVE_SCORE = 'UPDATE_INITIATIVE_SCORE';
 */
 
 export function querySpells(query: string): AppUpdate {
-  const getSpells: AppUpdate = (dispatch: Dispatch, getState: () => AppState) => {
-    dispatch(spellQueryRequest());
-    let xhr: XMLHttpRequest = new XMLHttpRequest();
-    xhr.addEventListener('loadend', (response) => {
-      dispatch(spellQueryResponse(response));
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    api.querySpells(query).then((results: Spell[]) => {
+      dispatch(spellQueryResponse(results));
     });
-    xhr.open('GET', `http://localhost:8000/api/spell/?name=${query}`);
-    xhr.send();
   }
-  return getSpells;
 }
 
 

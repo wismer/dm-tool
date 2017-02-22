@@ -30,6 +30,6 @@ export function spells(state: SpellList, action: any): SpellList {
       return querySpells(state);
     case SPELL_QUERY_RESPONSE:
       return handleQueryResponse(state, action.spells);
+    default: return state;
   }
-  return state;
 }

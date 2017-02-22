@@ -1,10 +1,10 @@
 import {
   Encounter,
   EncounterUpdate,
-  // JSONListResponse,
-  // JSONError,
+  Spell,
   ServerCode
 } from './interfaces';
+import { fetchLocally } from './util';
 
 export function getEncounters<T>(routerLocation: any, params: { id?: string }, page: number): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -100,5 +100,22 @@ export function endEncounterRound<T>(encounterUpdate: EncounterUpdate): Promise<
     xhr.open('PATCH', `http://localhost:8000/api/encounter/${encounterUpdate.id}/`);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(encounterUpdate));
+  });
+}
+
+export function querySpells<T>(query: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let storedData = fetchLocally<{results: Spell[]}>('spells', query);
+    if (storedData) {
+      return resolve(storedData.results);
+    }
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.addEventListener('loadend', () => {
+      localStorage.setItem('spells', xhr.responseText);
+      const data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
+    xhr.open('GET', `http://localhost:8000/api/spell/?name=${query}`);
+    xhr.send();
   });
 }

@@ -41,12 +41,20 @@ class SpellListContainer extends React.Component<SpellSearchResults, FormState> 
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentDidMount() {
+    this.fetchSpells()
+  }
+
+  fetchSpells() {
+    this.props.querySpellName(this.state.query);
+  }
+
   handleChange(e: any) {
     this.setState({ query: e.target.value });
   }
 
   handleSubmit() {
-    this.props.querySpellName(this.state.query);
+    this.fetchSpells();
   }
 
   render() {
