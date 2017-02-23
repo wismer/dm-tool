@@ -4,7 +4,7 @@ import {
   Spell,
   ServerCode
 } from './interfaces';
-import { fetchLocally } from './util';
+import { fetchLocally, wrapPayload } from './util';
 
 export function getEncounters<T>(routerLocation: any, params: { id?: string }, page: number): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -113,7 +113,7 @@ export function querySpells<T>(query: string): Promise<T> {
     xhr.addEventListener('loadend', () => {
       localStorage.setItem('spells', xhr.responseText);
       const data = JSON.parse(xhr.responseText);
-      resolve(data);
+      resolve(wrapPayload(data.results, 'spells'));
     });
     xhr.open('GET', `http://localhost:8000/api/spell/?name=${query}`);
     xhr.send();

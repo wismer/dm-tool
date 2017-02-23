@@ -1,16 +1,27 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import { Form, FormGroup, FormControl, Col, Row, Panel } from 'react-bootstrap';
-import { AppState, SpellSearchResults, Spell, FormState } from '../interfaces';
-import { spellListDispatchers } from '../redux/dispatchers';
+import { SpellSearchResults, Spell, FormState } from '../interfaces';
+// import { spellListDispatchers } from '../redux/dispatchers';
 
-function spellProps(state: AppState, props: any): SpellSearchResults {
-  const { spells: spellState } = state;
-  return {
-    results: spellState.spells.map(id => spellState.spellsById[id]),
-    querySpellName: props.querySpellName
-  };
+
+interface SpellListProps extends SpellSearchResults, FormState {
+  handleChange: (e: any) => void;
+  spellQuery: string;
 }
+//
+// function spellProps(state: AppState, props: any): SpellSearchResults {
+//   const { spells: spellState } = state;
+//   const spells = spellState.spells.map(id => spellState.spellsById[id]);
+//   const results = props.query
+//     ? spells.filter((spell: Spell) => new RegExp(props.query, 'i').exec(spell.name))
+//     : spells;
+//   return {
+//     results,
+//     querySpellName: props.querySpellName,
+//     spellQuery: spellState.spellQuery
+//   };
+// }
 
 
 const SpellListResult = (props: { spell: Spell }) => {
@@ -30,58 +41,25 @@ const SpellListResult = (props: { spell: Spell }) => {
   );
 }
 
-class SpellListContainer extends React.Component<SpellSearchResults, FormState> {
-  constructor(props: SpellSearchResults) {
-    super(props);
-    this.state = {
-      query: ''
-    };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  componentDidMount() {
-    this.fetchSpells()
-  }
-
-  fetchSpells() {
-    this.props.querySpellName(this.state.query);
-  }
-
-  handleChange(e: any) {
-    this.setState({ query: e.target.value });
-  }
-
-  handleSubmit() {
-    this.fetchSpells();
-  }
-
-  render() {
-    const spellResults = this.props.results.map((e, i) => <SpellListResult key={i} spell={e} />);
-    return (
-      <div className='spell-list'>
-        <Form horizontal>
-          <FormGroup controlId='formSpellQuery'>
-            <Col sm={2}>
-            </Col>
-            <Col sm={10}>
-              <FormControl onChange={this.handleChange} value={this.state.query} type="search" placeholder="search spell by name" />
-            </Col>
-          </FormGroup>
-          <FormGroup controlId='spellSubmit'>
-            <Col smOffset={2} sm={10}>
-              <FormControl type='submit' onClick={this.handleSubmit} />
-            </Col>
-          </FormGroup>
-        </Form>
-        <div className='spell-results'>
-          {spellResults}
-        </div>
+export default function SpellListContainer(props: SpellListProps) {
+  const spellResults = props.results.map((e, i) => <SpellListResult key={i} spell={e} />);
+  return (
+    <div className='spell-list'>
+      <Form horizontal>
+        <FormGroup controlId='formSpellQuery'>
+          <Col sm={2}>
+          </Col>
+          <Col sm={10}>
+            <FormControl onChange={e => props.handleChange(e.target)} value={props.spellQuery} type="search" placeholder="search spell by name" />
+          </Col>
+        </FormGroup>
+      </Form>
+      <div className='spell-results'>
+        {spellResults}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
-const SpellListComponent = connect(spellProps, spellListDispatchers)(SpellListContainer);
-export default SpellListComponent;
+// const SpellListComponent = connect(spellProps, spellListDispatchers)(SpellListContainer);
+// export default SpellListComponent ;

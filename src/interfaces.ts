@@ -38,6 +38,7 @@ export interface SpellAction extends Action {
 export interface SpellSearchResults {
   results: Spell[];
   querySpellName: (query: string) => void;
+  spellQuery: string;
 }
 
 export interface FormState {

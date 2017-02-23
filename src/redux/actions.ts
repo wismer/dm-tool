@@ -6,8 +6,9 @@ import {
   EncounterUpdate,
   Spell
 } from '../interfaces';
-
+// import * as _ from 'underscore';
 import * as api from '../api';
+import { wrapPayload } from '../util';
 
 interface Dispatch {
   (action: any): AppState;
@@ -19,10 +20,11 @@ export const REFRESH_ENCOUNTERS = 'REFRESH_ENCOUNTERS';
 
 export const SPELL_QUERY_RESPONSE = 'SPELL_QUERY_RESPONSE';
 
-function spellQueryResponse(spells: Spell[]): any {
+function spellQueryResponse(spellsById: Spell[], spells: number[], spellQuery?: string): any {
   return {
     type: SPELL_QUERY_RESPONSE,
-    spells
+    spells,
+    spellQuery
   };
 }
 
@@ -146,9 +148,15 @@ export const UPDATE_INITIATIVE_SCORE = 'UPDATE_INITIATIVE_SCORE';
 
 export function querySpells(query: string): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    api.querySpells(query).then((results: Spell[]) => {
-      dispatch(spellQueryResponse(results));
-    });
+    const { spells: spellState } = getState();
+    if (spellState.spells.length > 0) {
+      dispatch(spellQueryResponse(spellState.spellsById, spellState.spells, query));
+    } else {
+      api.querySpells(query).then((results: Spell[]) => {
+        const data = wrapPayload<Spell>(results, 'spells');
+        dispatch(spellQueryResponse(data.itemsById, data.items, query));
+      });
+    }
   }
 }
 

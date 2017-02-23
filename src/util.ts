@@ -48,24 +48,22 @@ interface PayloadItem {
   id: number;
 }
 
-interface SerializedPayload<T> {
+interface ItemID<T> {
   [index: number]: T;
 }
 
 interface NormalizedPayload<T> {
-  charactersById?: SerializedPayload<T>;
-  characters?: number[];
-  encountersById?: SerializedPayload<T>
-  encounters?: number[];
+  items: number[];
+  itemsById: ItemID<T>;
 }
 
-export function wrapPayload<T extends PayloadItem, R>(payload: T[], key: string): NormalizedPayload<R> {
+export function wrapPayload<T extends PayloadItem>(payload: T[], key: string): NormalizedPayload<T> {
   return {
-    [`${key}ById`]: payload.reduce((prev: NormalizedPayload<R>, next: T) => {
+    itemsById: payload.reduce((prev: ItemID<T>, next: T) => {
       prev[next.id] = next;
       return prev;
     }, {}),
-    [key]: payload.map((item: T) => item.id)
+    items: payload.map((item: T) => item.id)
   };
 }
 
