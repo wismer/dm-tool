@@ -1,9 +1,9 @@
-import { SpellList, Spell } from '../../interfaces';
+import { SpellList, NormalizedPayload, Spell } from '../../interfaces';
 import { SPELL_QUERY_RESPONSE, SPELL_QUERY_REQUEST } from '../actions';
 
 const initialState: SpellList = {
-  spellsById: [],
-  spells: [],
+  itemsById: {},
+  items: [],
   spellSchools: ['evocation', 'necromancy'],
   spellQuery: '',
 };
@@ -12,9 +12,10 @@ function querySpells(state: SpellList): SpellList {
   return Object.assign({}, state, { isLoading: true });
 }
 
-function handleQueryResponse(state: SpellList, spells: Spell[], querySpells?: string): SpellList {
+function handleQueryResponse(state: SpellList, payload: NormalizedPayload<Spell>, spellQuery?: string): SpellList {
   return Object.assign({}, state, {
-    querySpells: querySpells || '',
+    spellQuery: spellQuery || state.spellQuery,
+    ...payload
   });
 }
 
@@ -27,7 +28,8 @@ export function spells(state: SpellList, action: any): SpellList {
     case SPELL_QUERY_REQUEST:
       return querySpells(state);
     case SPELL_QUERY_RESPONSE:
-      return handleQueryResponse(state, action.spells, action.querySpells);
+      console.log(action);
+      return handleQueryResponse(state, action.spellPayload, action.spellQuery);
     default: return state;
   }
 }

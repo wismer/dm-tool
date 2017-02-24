@@ -4,7 +4,8 @@ import {
   Character,
   Encounter,
   EncounterUpdate,
-  Spell
+  Spell,
+  NormalizedPayload
 } from '../interfaces';
 // import * as _ from 'underscore';
 import * as api from '../api';
@@ -20,10 +21,18 @@ export const REFRESH_ENCOUNTERS = 'REFRESH_ENCOUNTERS';
 
 export const SPELL_QUERY_RESPONSE = 'SPELL_QUERY_RESPONSE';
 
-function spellQueryResponse(spellsById: Spell[], spells: number[], spellQuery?: string): any {
+function spellQueryResponse(spellPayload: NormalizedPayload<Spell>, spellQuery?: string): any {
   return {
     type: SPELL_QUERY_RESPONSE,
-    spells,
+    spellQuery,
+    spellPayload
+  };
+}
+
+function payloadResponse<T>(payload: NormalizedPayload<T>, spellQuery?: string): any {
+  return {
+    type: SPELL_QUERY_RESPONSE,
+    payload,
     spellQuery
   };
 }
@@ -149,12 +158,13 @@ export const UPDATE_INITIATIVE_SCORE = 'UPDATE_INITIATIVE_SCORE';
 export function querySpells(query: string): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
     const { spells: spellState } = getState();
-    if (spellState.spells.length > 0) {
-      dispatch(spellQueryResponse(spellState.spellsById, spellState.spells, query));
+    if (spellState.items.length > 0) {
+      const payload = { itemsById: spellState.itemsById, items: spellState.items };
+      dispatch(payloadResponse<Spell>(payload, query));
     } else {
       api.querySpells(query).then((results: Spell[]) => {
         const data = wrapPayload<Spell>(results, 'spells');
-        dispatch(spellQueryResponse(data.itemsById, data.items, query));
+        dispatch(spellQueryResponse(data, query));
       });
     }
   }

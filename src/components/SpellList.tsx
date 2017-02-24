@@ -9,20 +9,6 @@ interface SpellListProps extends SpellSearchResults, FormState {
   handleChange: (e: any) => void;
   spellQuery: string;
 }
-//
-// function spellProps(state: AppState, props: any): SpellSearchResults {
-//   const { spells: spellState } = state;
-//   const spells = spellState.spells.map(id => spellState.spellsById[id]);
-//   const results = props.query
-//     ? spells.filter((spell: Spell) => new RegExp(props.query, 'i').exec(spell.name))
-//     : spells;
-//   return {
-//     results,
-//     querySpellName: props.querySpellName,
-//     spellQuery: spellState.spellQuery
-//   };
-// }
-
 
 const SpellListResult = (props: { spell: Spell }) => {
   return (
@@ -50,7 +36,7 @@ export default function SpellListContainer(props: SpellListProps) {
           <Col sm={2}>
           </Col>
           <Col sm={10}>
-            <FormControl onChange={e => props.handleChange(e.target)} value={props.spellQuery} type="search" placeholder="search spell by name" />
+            <FormControl onChange={e => props.handleChange(e.target)} type="search" placeholder="search spell by name" />
           </Col>
         </FormGroup>
       </Form>
@@ -60,6 +46,3 @@ export default function SpellListContainer(props: SpellListProps) {
     </div>
   );
 }
-
-// const SpellListComponent = connect(spellProps, spellListDispatchers)(SpellListContainer);
-// export default SpellListComponent ;

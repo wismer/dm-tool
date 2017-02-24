@@ -1,4 +1,4 @@
-import { AppState, CharacterState } from './interfaces';
+import { AppState, CharacterState, NormalizedPayload } from './interfaces';
 
 export function fetchPersistentStorage(): AppState | void {
   try {
@@ -49,20 +49,16 @@ interface PayloadItem {
 }
 
 interface ItemID<T> {
-  [index: number]: T;
-}
-
-interface NormalizedPayload<T> {
-  items: number[];
-  itemsById: ItemID<T>;
+  [index: string]: T;
 }
 
 export function wrapPayload<T extends PayloadItem>(payload: T[], key: string): NormalizedPayload<T> {
+  const item: ItemID<T> = {};
   return {
     itemsById: payload.reduce((prev: ItemID<T>, next: T) => {
       prev[next.id] = next;
       return prev;
-    }, {}),
+    }, item),
     items: payload.map((item: T) => item.id)
   };
 }

@@ -23,10 +23,11 @@ export interface Spell {
 }
 
 type SpellSchool = 'necromancy' | 'evocation' | 'divine' | 'illusion' // add more later
+export interface SpellSet {
+  [key: string]: Spell
+}
 
-export interface SpellList {
-  spellsById: Spell[];
-  spells: number[];
+export interface SpellList extends NormalizedPayload<Spell> {
   spellSchools: SpellSchool[];
   spellQuery: string;
 }
@@ -267,4 +268,17 @@ export interface Query {
 
 export interface QueryProps {
   receiveSearchResults: (results: SavedCharacter[]) => void;
+}
+
+export interface PayloadItem {
+  id: number;
+}
+
+export interface ItemID<T> {
+  [index: string]: T;
+}
+
+export interface NormalizedPayload<T> {
+  items: number[];
+  itemsById: ItemID<T>;
 }

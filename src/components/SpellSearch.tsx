@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { AppState, SpellSearchResults } from '../interfaces';
+import { AppState, SpellSearchResults, Spell } from '../interfaces';
 import { spellListDispatchers } from '../redux/dispatchers';
 import SpellList from './SpellList';
 
 function spellProps(state: AppState, props: any): SpellSearchResults {
   const { spells: spellState } = state;
   return {
-    results: spellState.spells.map(id => spellState.spellsById[id]),
+    results: spellState.items.map(id => spellState.itemsById[id]),
     querySpellName: props.querySpellName,
     spellQuery: spellState.spellQuery
   };
@@ -21,17 +21,24 @@ class SpellQuery extends React.Component<SpellSearchResults, Slice> {
     this.state = { slice: 20 };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
+  }
+
+  handleScroll() {
+    const { scrollHeight } = document.body;
+    const { scrollY } = window;
+    if (scrollY > scrollHeight * 0.75) {
+      this.setState({ slice: this.state.slice + 20 });
+    }
   }
 
   componentDidMount() {
     this.fetchSpells();
-    document.addEventListener('scroll', (e: UIEvent) => {
-      const { scrollHeight } = document.body;
-      const { scrollY } = window;
-      if (scrollY > scrollHeight * 0.75) {
-        this.setState({ slice: this.state.slice + 20 });
-      }
-    });
+    document.addEventListener('scroll', this.handleScroll);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('scroll', this.handleScroll);
   }
 
   fetchSpells() {
@@ -48,7 +55,10 @@ class SpellQuery extends React.Component<SpellSearchResults, Slice> {
   }
 
   render() {
-    const results = this.props.results.slice(0, this.state.slice);
+    const { spellQuery } = this.props;
+    const results = this.props.results
+      .filter((c: Spell) => new RegExp(spellQuery, 'i').exec(c.name))
+      .slice(0, this.state.slice);
     return <SpellList
       {...this.props}
       handleChange={this.handleChange}
