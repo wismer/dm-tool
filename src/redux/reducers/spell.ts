@@ -28,7 +28,6 @@ export function spells(state: SpellList, action: any): SpellList {
     case SPELL_QUERY_REQUEST:
       return querySpells(state);
     case SPELL_QUERY_RESPONSE:
-      console.log(action);
       return handleQueryResponse(state, action.spellPayload, action.spellQuery);
     default: return state;
   }

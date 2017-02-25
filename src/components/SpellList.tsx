@@ -10,17 +10,19 @@ interface SpellListProps extends SpellSearchResults, FormState {
   spellQuery: string;
 }
 
-const SpellListResult = (props: { spell: Spell }) => {
+const SpellListResult = (props: Spell) => {
   return (
-    <Panel header={props.spell.name} className='spell-result'>
-      <p>{props.spell.desc}</p>
+    <Panel header={props.name} className='spell-result'>
+      <p>
+        {props.desc}
+      </p>
 
       <Row>
         <Col className='spell-result spell-level' xs={6}>
-          LVL {props.spell.level}
+          LVL {props.level}
         </Col>
         <Col className='spell-result spell-duration' xs={6}>
-          Duration: {props.spell.duration}
+          Duration: {props.duration}
         </Col>
       </Row>
     </Panel>
@@ -28,7 +30,7 @@ const SpellListResult = (props: { spell: Spell }) => {
 }
 
 export default function SpellListContainer(props: SpellListProps) {
-  const spellResults = props.results.map((e, i) => <SpellListResult key={i} spell={e} />);
+  const spellResults = props.results.map((e: Spell, i: number) => <SpellListResult key={i} {...e} />);
   return (
     <div className='spell-list'>
       <Form horizontal>
