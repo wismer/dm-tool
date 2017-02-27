@@ -1,4 +1,5 @@
 import * as R from '@types/react-router';
+import { Action } from 'redux';
 
 export enum SpellComponent {
   Verbal = 1,
@@ -21,16 +22,28 @@ export interface Spell {
   level: number;
 }
 
-export interface SpellList {
-  searchResults: Array<Spell>;
-  spellSchools: Array<string>;
-  spellQuery: null | string;
-  isLoading: boolean;
-  didErr: boolean;
+type SpellSchool = 'necromancy' | 'evocation' | 'divine' | 'illusion' // add more later
+export interface SpellSet {
+  [key: string]: Spell
 }
 
-export interface Tool {
-  name: string;
+export interface SpellList extends NormalizedPayload<Spell> {
+  spellSchools: SpellSchool[];
+  spellQuery: string;
+}
+
+export interface SpellAction extends Action {
+  spells: Spell[];
+}
+
+export interface SpellSearchResults {
+  results: Spell[];
+  querySpellName: (query: string) => void;
+  spellQuery: string;
+}
+
+export interface FormState {
+  query: string;
 }
 
 /*
@@ -91,7 +104,7 @@ export interface Encounter {
   name: string | null;
   roster: CharacterState[];
   currentTurn: number;
-  id: null | number;
+  id: number;
   surpriseRound: boolean;
   created?: Date
 }
@@ -134,9 +147,6 @@ export type RouterLocation = {
 
 export interface EncounterListProps extends R.RouterState {
   encounters: Array<Encounter>;
-  activeEncounter: null | number;
-  activePage: number;
-  maxPage: number;
 }
 
 export interface ToolState {
@@ -162,16 +172,24 @@ export interface RaceState {
   races: Array<Race>;
 }
 
-export interface AppState {
-  race: RaceState;
-  tools: ToolState;
-  spells: SpellList;
+export interface EncounterState {
+  encounters: number[];
+  encountersById: { [id: number]: Encounter };
+  characterStates: number[];
+  characterStatesById: { [id: number]: CharacterState };
+  page: number;
 }
 
-export interface EncounterTool extends Tool {
-  id: null | number;
-  currentTurn: number;
-  surpriseRound: boolean;
+export interface AppState {
+  race: RaceState;
+  spells: SpellList;
+  encounter: EncounterState;
+  character: CharState
+}
+
+export interface CharState {
+  characters: number[];
+  charactersById: { [id: string]: SavedCharacter };
 }
 
 export enum MenuOptions {
@@ -250,4 +268,17 @@ export interface Query {
 
 export interface QueryProps {
   receiveSearchResults: (results: SavedCharacter[]) => void;
+}
+
+export interface PayloadItem {
+  id: number;
+}
+
+export interface ItemID<T> {
+  [index: string]: T;
+}
+
+export interface NormalizedPayload<T> {
+  items: number[];
+  itemsById: ItemID<T>;
 }

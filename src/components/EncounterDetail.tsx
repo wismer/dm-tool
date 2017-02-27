@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { encounterDetailProps } from '../redux/reducers/encounter';
 import { encounterViewDispatch } from '../redux/dispatchers';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
@@ -9,23 +8,24 @@ import {
   Panel,
   Col,
 } from 'react-bootstrap';
-// import CharacterList from './CharacterList';
 import {
   Encounter,
   CharacterState,
+  AppState,
 } from '../interfaces';
-// import { CharacterMap } from '../util';
-/*
-  1. hook up props
-  2. hook up dispatchers (end turn, next turn, etc)
-  3. ???
-  4. hook up the router?
-*/
 
 type DetailState = {
   activeIdx: number;
-
 };
+
+function encounterDetailProps(state: AppState, prevProps?: any): Encounter {
+  let encounterID = prevProps.params.id;
+  let { encounter: encounterState } = state;
+  if (prevProps.params && encounterID) {
+    return encounterState.encountersById[encounterID]
+  }
+  return encounterState.encountersById[encounterID]
+}
 
 
 interface EncounterView extends Encounter {
@@ -34,14 +34,6 @@ interface EncounterView extends Encounter {
   id: number;
   endRound: (id: number, endOfRound: boolean) => void;
 }
-//
-// function CharacterStateDetail(props: CharacterStateProps) {
-//   return (
-//     <div className='char-detail'>
-//       {/* character detail */}
-//     </div>
-//   );
-// }
 
 class EncounterDetail extends React.Component<EncounterView, DetailState> {
   constructor() {

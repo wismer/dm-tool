@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import * as React from 'react';
 import { Link } from 'react-router';
-import { Encounter, EncounterListProps } from '../interfaces';
+import { Encounter, EncounterListProps, AppState } from '../interfaces';
 import {
   ListGroup,
   ListGroupItem,
@@ -10,7 +10,6 @@ import {
   Pagination,
 } from 'react-bootstrap';
 import { withRouter } from 'react-router';
-import { encounterListProps } from '../redux/reducers/encounter';
 import { encounterListDispatch } from '../redux/dispatchers';
 /*
 ENCOUNTER
@@ -43,6 +42,13 @@ ENCOUNTER
   <Encounter />
 */
 
+function encounterListProps(state: AppState, props: any): EncounterListProps {
+  const { encounters, encountersById } = state.encounter;
+  return {
+    ...props,
+    encounters: encounters.map(id => encountersById[id]),
+  };
+}
 
 // FIXME yea yea I know this doesn't belong here.
 interface EncounterDispatch {
@@ -64,12 +70,6 @@ class EncounterListContainer extends React.Component<ListProps, EncounterListSta
 
   fetchData() {
     this.props.retrieveEncounterData(this.props.location, this.props.params);
-  }
-
-  componentWillReceiveProps(nextProps: ListProps) {
-    if (nextProps.activePage !== this.props.activePage) {
-      this.fetchData();
-    }
   }
 
   render() {

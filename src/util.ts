@@ -1,4 +1,4 @@
-import { AppState, CharacterState } from './interfaces';
+import { AppState, CharacterState, NormalizedPayload } from './interfaces';
 
 export function fetchPersistentStorage(): AppState | void {
   try {
@@ -42,4 +42,37 @@ export function CharacterMap(characters: CharacterState[]) {
       }
     }
   };
+}
+
+interface PayloadItem {
+  id: number;
+}
+
+interface ItemID<T> {
+  [index: string]: T;
+}
+
+export function wrapPayload<T extends PayloadItem>(payload: T[], key: string): NormalizedPayload<T> {
+  const item: ItemID<T> = {};
+  return {
+    itemsById: payload.reduce((prev: ItemID<T>, next: T) => {
+      prev[next.id] = next;
+      return prev;
+    }, item),
+    items: payload.map((item: T) => item.id)
+  };
+}
+
+interface Resource {
+  name?: string;
+}
+
+export function fetchLocally<T extends Resource>(key: string, query: string): {results: T[]} | void {
+  const data = localStorage.getItem(key);
+  if (data) {
+    let payload = JSON.parse(data);
+    return {
+      results: payload.results.filter((c: T) => new RegExp(query, 'i').exec(c.name || ''))
+    };
+  }
 }

@@ -3,10 +3,13 @@ import {
   SavedCharacter,
   Character,
   Encounter,
-  EncounterUpdate
+  EncounterUpdate,
+  Spell,
+  NormalizedPayload
 } from '../interfaces';
-
+// import * as _ from 'underscore';
 import * as api from '../api';
+import { wrapPayload } from '../util';
 
 interface Dispatch {
   (action: any): AppState;
@@ -18,21 +21,23 @@ export const REFRESH_ENCOUNTERS = 'REFRESH_ENCOUNTERS';
 
 export const SPELL_QUERY_RESPONSE = 'SPELL_QUERY_RESPONSE';
 
-function spellQueryResponse(response: any): any {
-  let data = JSON.parse(response.target.responseText);
+function spellQueryResponse(spellPayload: NormalizedPayload<Spell>, spellQuery?: string): any {
   return {
     type: SPELL_QUERY_RESPONSE,
-    spells: data.results,
-  }
+    spellQuery,
+    spellPayload
+  };
+}
+
+function payloadResponse<T>(payload: NormalizedPayload<T>, spellQuery?: string): any {
+  return {
+    type: SPELL_QUERY_RESPONSE,
+    payload,
+    spellQuery
+  };
 }
 
 export const SPELL_QUERY_REQUEST = 'SPELL_QUERY_REQUEST';
-
-function spellQueryRequest(): any {
-  return {
-    type: SPELL_QUERY_REQUEST,
-  };
-}
 
 export const INIT_SAVE_CHARACTER_DM_TOOL = 'INIT_SAVE_CHARACTER_DM_TOOL';
 
@@ -151,16 +156,18 @@ export const UPDATE_INITIATIVE_SCORE = 'UPDATE_INITIATIVE_SCORE';
 */
 
 export function querySpells(query: string): AppUpdate {
-  const getSpells: AppUpdate = (dispatch: Dispatch, getState: () => AppState) => {
-    dispatch(spellQueryRequest());
-    let xhr: XMLHttpRequest = new XMLHttpRequest();
-    xhr.addEventListener('loadend', (response) => {
-      dispatch(spellQueryResponse(response));
-    });
-    xhr.open('GET', `http://localhost:8000/api/spell/?name=${query}`);
-    xhr.send();
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    const { spells: spellState } = getState();
+    if (spellState.items.length > 0) {
+      const payload = { itemsById: spellState.itemsById, items: spellState.items };
+      dispatch(payloadResponse<Spell>(payload, query));
+    } else {
+      api.querySpells(query).then((results: Spell[]) => {
+        const data = wrapPayload<Spell>(results, 'spells');
+        dispatch(spellQueryResponse(data, query));
+      });
+    }
   }
-  return getSpells;
 }
 
 
@@ -182,19 +189,18 @@ function encounterDetailLoad(encounter: Encounter): any {
     encounter
   };
 }
-
-export const LOAD_ENCOUNTERS_INIT = 'LOAD_ENCOUNTERS_INIT';
-function loadEncountersInit(): any {
-  return {
-    type: LOAD_ENCOUNTERS_INIT,
-  };
-}
+// REPLACE ME TODO
+// export const LOAD_ENCOUNTERS_INIT = 'LOAD_ENCOUNTERS_INIT';
+// function loadEncountersInit(): any {
+//   return {
+//     type: LOAD_ENCOUNTERS_INIT,
+//   };
+// }
 
 export function retrieveEncounterData(location: ReactRouter.RouterState, params: { id?: string }): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    let { tools } = getState();
-    dispatch(loadEncountersInit());
-    api.getEncounters(location, params, tools.encounterPage).then((payload: any) => {
+    let { encounter: encounterState } = getState();
+    api.getEncounters(location, params, encounterState.page).then((payload: any) => {
       if (payload.results) {
         dispatch(encounterStateLoad(payload.results, payload.count))
       } else {
@@ -277,11 +283,12 @@ function endRoundFinish(data: any): any {
 
 export function endRound(id: number, endOfRound: boolean) {
   return (dispatch: Dispatch, getState: () => AppState) => {
-    let { tools } = getState();
-    let encounter = tools.encounters.find((e: Encounter) => e.id === id);
-    if (!encounter) {
+    let { encounter: encounterState } = getState();
+    let encounterID = encounterState.encounters.find(e => e === id);
+    if (!encounterID) {
       return;
     }
+    let encounter = encounterState.encountersById[encounterID];
     let data: EncounterUpdate = {
       id,
       endOfRound,

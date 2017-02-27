@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { CreateCharacterProps, CreateCharacterState } from '../interfaces';
-import { addCharacterProps } from '../redux/reducers/tools';
 import { addCharacterDispatch } from '../redux/dispatchers';
 import {
   Form,
@@ -14,6 +13,12 @@ import {
   Checkbox,
   Panel
 } from 'react-bootstrap';
+
+
+//FIXME
+function addCharacterProps(s: any, props: any): CreateCharacterProps {
+  return { isOpen: false, saveCharacter: props.saveCharacter };
+}
 
 class AddCharacterContainer extends React.Component<CreateCharacterProps, CreateCharacterState> {
   constructor() {
