@@ -1,8 +1,6 @@
 import * as React from 'react';
-// import { connect } from 'react-redux';
 import { Form, FormGroup, FormControl, Col, Row, Panel } from 'react-bootstrap';
 import { SpellSearchResults, Spell, FormState } from '../interfaces';
-// import { spellListDispatchers } from '../redux/dispatchers';
 
 
 interface SpellListProps extends SpellSearchResults, FormState {
