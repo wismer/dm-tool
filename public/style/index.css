@@ -89,3 +89,9 @@
 .stat-blocks {
   float: right;
 }
+
+.bottom-steps {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+}

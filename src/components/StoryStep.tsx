@@ -31,7 +31,7 @@ function StoryStep(props: SSteps) {
     );
   });
   return (
-    <Step.Group>
+    <Step.Group fluid>
       {steps}
     </Step.Group>
   );
