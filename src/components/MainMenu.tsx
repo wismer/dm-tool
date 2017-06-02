@@ -3,7 +3,7 @@ import {
   Panel,
 } from 'react-bootstrap';
 import { MenuOptions } from '../interfaces';
-import { Link, withRouter } from 'react-router';
+import { Link, withRouter } from 'react-router-dom';
 
 
 // function NavLink(props: any) {
@@ -31,11 +31,11 @@ class MainMenu extends React.Component<any, {active: MenuOptions}> {
       <Panel>
         <ul className='nav nav-pills nav-stacked'>
           <li role='presentation'>
-            <Link activeClassName='active' to='/dm-tools/encounters/'>
+            <Link to='/dm-tools/encounters/'>
               Encounters
             </Link>
           </li>
-          <Link activeClassName='active' to='/dm-tools/spells/'>
+          <Link to='/dm-tools/spells/'>
             Spell Lookup
           </Link>
         </ul>

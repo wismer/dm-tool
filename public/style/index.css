@@ -37,3 +37,55 @@
   align-self: flex-start;
   width: 33%;
 }
+
+.spell-toggle {
+  margin: 5px;
+  width: 120px;
+}
+
+.school-filter-active {
+  background: #EFEFEF;
+  color: #ACACAC;
+}
+
+
+.paginator {
+  position: absolute;
+  height: 300px;
+  top: 150px;
+  left: 0;
+  width: 125px;
+}
+
+.paginator.paginator-scroll {
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.pagination-flex {
+  display: flex;
+  flex-flow: column;
+  padding-left: 0;
+  width: 100%;
+  align-items: center;
+}
+
+.pagination-flex > li {
+  display: inline;
+  padding: 0.25em 0 0.25em 0;
+}
+
+.pagination-flex a {
+  text-align: center;
+}
+
+.possible-paths {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-around;
+}
+
+.stat-blocks {
+  float: right;
+}

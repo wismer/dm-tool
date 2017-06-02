@@ -2,15 +2,101 @@ import {
   Encounter,
   EncounterUpdate,
   Spell,
-  ServerCode
+  ChapterResource,
+  ChapterField,
+  ClueModel,
+  ClueField,
+  ServerCode,
 } from './interfaces';
 import { fetchLocally, wrapPayload } from './util';
+
+
+const API_HOST = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:8000/api'
+  : 'http://dungeon-dragon.herokuapp.com/api';
+
+export function addClueToChapter(clue: ClueField, chapterID: number): Promise<any> {
+  const options = {
+    method: 'POST',
+    body: JSON.stringify({
+      chapter: chapterID,
+      description: clue.description,
+      requiredStats: clue.requiredStats,
+    }),
+    headers: { 'Content-Type': 'application/json' }
+  };
+  return fetch(`http://localhost:8000/api/clue/`, options)
+    .then(response => response.json(), () => {});
+}
+
+export function updateClue(clue: ClueModel): Promise<any> {
+  const options = {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(clue)
+  };
+
+  return fetch(`${API_HOST}/clue/`, options).then(r => r.json());
+}
+
+export function saveChapter<T>(chapter: ChapterField): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.addEventListener('loadend', () => {
+      // let url = '${API_HOST}/api/encounter/';
+      let data = JSON.parse(xhr.responseText);
+      if (xhr.status === ServerCode.RESOURCE_ADDED) {
+        resolve(data);
+      } else {
+        reject(data);
+      }
+    });
+    let url = `http://localhost:8000/api/chapter/`;
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(chapter));
+  });
+}
+
+export function loadChapterDetail(chapterID: number | string): Promise<any> {
+  return fetch(`http://localhost:8000/api/chapter/${chapterID}/`).then(c => c.json())
+}
+
+export function saveClue(clue: ClueField, chapterID: string): Promise<any> {
+  const options = {
+    method: 'POST',
+    data: JSON.stringify({
+      chapter: parseInt(chapterID),
+      description: clue.description
+    })
+  };
+  return fetch(`http://localhost:8000/api/chapter/${chapterID}/add_clue/`, options).then(c => c.json());
+}
+
+export function loadChapterList<T>(): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.addEventListener('loadend', () => {
+      // let url = '${API_HOST}/api/encounter/';
+      let data = JSON.parse(xhr.responseText);
+      const chapters: ChapterResource[] = data.results as ChapterResource[];
+      if (xhr.status === ServerCode.OK) {
+        resolve(chapters);
+      } else {
+        reject(data);
+      }
+    });
+    let url = `http://localhost:8000/api/chapter/`;
+    xhr.open('GET', url);
+    xhr.send();
+  });
+}
 
 export function getEncounters<T>(routerLocation: any, params: { id?: string }, page: number): Promise<T> {
   return new Promise((resolve, reject) => {
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     xhr.addEventListener('loadend', () => {
-      // let url = 'http://localhost:8000/api/encounter/';
+      // let url = '${API_HOST}/api/encounter/';
       let data = JSON.parse(xhr.responseText);
       if (xhr.status === ServerCode.OK) {
         resolve(data);
@@ -18,7 +104,7 @@ export function getEncounters<T>(routerLocation: any, params: { id?: string }, p
         reject(data);
       }
     });
-    let url = 'http://localhost:8000/api/encounter/';
+    let url = `${API_HOST}/api/encounter/`;
     if (params.id) {
       url += `${params.id}/`;
     } else {
@@ -40,7 +126,7 @@ export function saveCharacter<T, C>(character: C): Promise<T> {
         reject(data);
       }
     });
-    xhr.open('POST', `http://localhost:8000/api/character/`);
+    xhr.open('POST', `${API_HOST}/api/character/`);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(character));
   });
@@ -48,7 +134,7 @@ export function saveCharacter<T, C>(character: C): Promise<T> {
 
 export function getCharacters<T>(query?: string): Promise<T> {
   return new Promise((resolve, reject) => {
-    let url = 'http://localhost:8000/api/character/';
+    let url = '${API_HOST}/api/character/';
     if (query) {
       url += query;
     }
@@ -75,7 +161,7 @@ export function saveEncounter<T>(encounter: Encounter): Promise<T> {
         reject('FAILED');
       }
     });
-    xhr.open('POST', `http://localhost:8000/api/encounter/`);
+    xhr.open('POST', `${API_HOST}/api/encounter/`);
     xhr.setRequestHeader('Content-Type', 'application/json');
     let data = {
       name: encounter.name,
@@ -97,7 +183,7 @@ export function endEncounterRound<T>(encounterUpdate: EncounterUpdate): Promise<
         reject('FAILED');
       }
     });
-    xhr.open('PATCH', `http://localhost:8000/api/encounter/${encounterUpdate.id}/`);
+    xhr.open('PATCH', `${API_HOST}/api/encounter/${encounterUpdate.id}/`);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(encounterUpdate));
   });
@@ -115,7 +201,7 @@ export function querySpells<T>(query: string): Promise<T> {
       const data = JSON.parse(xhr.responseText);
       resolve(wrapPayload(data.results, 'spells'));
     });
-    xhr.open('GET', `http://localhost:8000/api/spell/?name=${query}`);
+    xhr.open('GET', `${API_HOST}/api/spell/?name=${query}`);
     xhr.send();
   });
 }

@@ -1,10 +1,63 @@
-import * as R from '@types/react-router';
 import { Action } from 'redux';
+import * as R from 'react-router';
+import { Action as ReduxAction } from 'redux';
+
+
+export interface FilterAction<T> extends ReduxAction {
+  filter: T;
+}
+
+// export interface ChapterState<T> {
+//   chapters: number[];
+//   chaptersById: ChapterCollection<T>;
+// }
+//
+// export interface ClueState {
+//   clues: number[];
+//   cluesById: ClueCollection;
+// }
+//
+// export interface OutcomeState {
+//   outcomes: number[];
+//   outcomesById: OutcomeCollection;
+// }
+//
+// export type ResourceState = OutcomeState & ClueState & ChapterState;
+//
+// export interface ChapterUpdate<T> {
+//   chapterID: number;
+//   data: T;
+// }
+//
+export interface SettingProps {
+  currentStep: StoryboardCreationStep;
+  chapterID?: number;
+}
+//
+// export interface APIRequest<T> {
+//   method: 'POST' | 'GET' | 'OPTIONS';
+//   payload: T;
+// }
+
+export interface SStep extends BaseChapter {
+  active: boolean;
+}
 
 export enum SpellComponent {
   Verbal = 1,
   Somatic = 2,
   Material = 3,
+}
+
+export enum SpellFilterState {
+  NONE,
+  SCHOOL,
+  NAME,
+  SCHOOL_NAME = SCHOOL | NAME,
+  LEVEL = 1 << 2,
+  SCHOOL_LVL = SCHOOL | LEVEL,
+  LVL_NAME = NAME | LEVEL,
+  ALL = SCHOOL | NAME | LEVEL
 }
 
 export interface Spell {
@@ -13,7 +66,7 @@ export interface Spell {
   desc: string;
   components: Array<SpellComponent>;
   componentDesc: null | string;
-  spellSchool: string;
+  school: SpellSchool;
   castingTime: string;
   duration: string;
   spellShape: null | string;
@@ -22,14 +75,21 @@ export interface Spell {
   level: number;
 }
 
-type SpellSchool = 'necromancy' | 'evocation' | 'divine' | 'illusion' // add more later
+export type SpellSchool = 'Necromancy' | 'Evocation' | 'Divination' | 'Illusion' | 'Conjuration' | 'Transmutation' | 'Enchantment' | 'Abjuration' // add more later
 export interface SpellSet {
   [key: string]: Spell
 }
 
+export interface SpellFilter {
+  school: SpellSchool;
+  active: boolean;
+}
+
 export interface SpellList extends NormalizedPayload<Spell> {
-  spellSchools: SpellSchool[];
   spellQuery: string;
+  activeSchools: SpellSchool[];
+  activeLevels: number[];
+  page?: number;
 }
 
 export interface SpellAction extends Action {
@@ -40,6 +100,9 @@ export interface SpellSearchResults {
   results: Spell[];
   querySpellName: (query: string) => void;
   spellQuery: string;
+  schools: SpellFilter[];
+  onSchoolFilterToggle: (school: SpellFilter) => void;
+  onSpellLevelChange: (lvl: number) => void;
 }
 
 export interface FormState {
@@ -71,6 +134,106 @@ export interface CreateCharacterProps {
 export interface CreateCharacterState {
   open?: boolean;
   character: Character;
+}
+
+// for ability/skill checks
+export enum Difficulty {
+  VERY_EASY = 5,
+  EASY = 10,
+  MODERATE = 15,
+  HARD = 20,
+  VERY_HARD = 25,
+  NEARLY_IMPOSSIBLE = 30
+};
+
+export type Skill = 'Investigation' | 'Nature' | 'Acrobatics' | 'Athletics' | 'Arcana' | 'Stealth' | 'Perception' | 'History';
+export type Ability = 'Strength' | 'Constitution' | 'Wisdom' | 'Charisma' | 'Dexterity' | 'Intellect';
+export interface Outcome {
+  value: Difficulty;
+  description: string;
+}
+
+export type Characteristics = Array<Skill | Ability>;
+export interface APIResource {
+  id: number;
+  modified: Date;
+  created: Date;
+}
+
+export interface BaseClue {
+  requiredStats: Characteristics;
+  description: string;
+}
+
+export interface BaseOutcome {
+  description: string;
+  dc: number;
+}
+
+export interface BaseChapter {
+  title: string;
+  description: string;
+}
+
+
+/*
+ *Resource Types*
+    Server data representations of clues, chapters and outcomes
+ *Model Types*
+    Deserialized representations of Resource Types
+*/
+
+// thing<ClueResource, OutcomeResource> = paylaod.results;
+export interface ChapterModel extends APIResource, BaseChapter {
+  clues: number[];
+}
+
+export interface ChapterResource extends APIResource, BaseChapter {
+  clues:  ClueResource[]; // number (after deserializing) | Chapter
+}
+
+export type ChapterField = BaseChapter;
+
+export type ChapterCollection = {
+  [id: number]: ChapterModel;
+};
+
+export interface ClueField extends BaseClue {
+  outcomes: Array<OutcomeResource | OutcomeField>;
+}
+
+export interface ClueModel extends BaseClue, APIResource {
+  chapter: number;
+  outcomes: number[];
+}
+
+export interface ClueResource extends BaseClue, APIResource {
+  chapter: number;
+  outcomes: OutcomeResource[];
+}
+
+export type ClueCollection = { [id: number]: ClueModel };
+export interface OutcomeField extends BaseOutcome {}
+export type OutcomeModel = OutcomeResource;
+export interface OutcomeResource extends BaseOutcome, APIResource {
+  clue: number;
+}
+
+export type OutcomeCollection = { [id: number]: OutcomeModel };
+export interface Storyboard {
+  // models
+  chaptersById: ChapterCollection;
+  cluesById: ClueCollection;
+  outcomesById: OutcomeCollection;
+  // ids
+  chapters: number[];
+  clues: number[];
+  outcomes: number[];
+
+  // metadata
+  steps: SStep[];
+  currentStep: StoryboardCreationStep;
+  loading: boolean;
 }
 
 
@@ -145,7 +308,7 @@ export type RouterLocation = {
   query: { [name: string]: string }
 }
 
-export interface EncounterListProps extends R.RouterState {
+export interface EncounterListProps extends R.Router {
   encounters: Array<Encounter>;
 }
 
@@ -180,11 +343,19 @@ export interface EncounterState {
   page: number;
 }
 
+export enum StoryboardCreationStep {
+  Setting,
+  PointsOfInterest,
+  NPCs
+}
+
+
 export interface AppState {
   race: RaceState;
   spells: SpellList;
   encounter: EncounterState;
-  character: CharState
+  character: CharState;
+  storyboard: Storyboard;
 }
 
 export interface CharState {

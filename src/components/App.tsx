@@ -1,23 +1,13 @@
 import * as React from "react";
 import { connect } from 'react-redux';
-import { AppState } from '../interfaces';
+// import { Route } from 'react-router-dom';
+// import ChapterIndex from './ChapterIndex';
 
 
-function raceProps(state: AppState): any  {
-  return state;
-}
-
-const ApplicationContainer = (props: any) => {
-  const { sidebar, main } = props;
+const ApplicationContainer = (props: {children?: React.ReactNode}) => {
   return (
-    <div id='dungeons-and-dragons'>
-      <div className='sidebar'>
-        {sidebar}
-      </div>
-
-      {main}
-    </div>
+    <div id='dungeons-and-dragons'></div>
   );
 }
 
-export const App = connect(raceProps)(ApplicationContainer);
+export const App = connect()(ApplicationContainer);

@@ -5,16 +5,53 @@ import {
   Encounter,
   EncounterUpdate,
   Spell,
-  NormalizedPayload
+  NormalizedPayload,
+  SpellFilter,
+  FilterAction,
+  ChapterResource,
+  ChapterField,
+  ClueField,
+  ClueModel,
+  ClueResource,
+  // OutcomeResource,
+  // ChapterUpdate,
 } from '../interfaces';
+import * as ReactRouter from 'react-router';
 // import * as _ from 'underscore';
 import * as api from '../api';
 import { wrapPayload } from '../util';
+
 
 interface Dispatch {
   (action: any): AppState;
 }
 type AppUpdate = (dispatch: Dispatch, getState: () => AppState) => void;
+
+
+export const CLUE_UPDATE = 'CLUE_UPDATE';
+function clueUpdate(clue: ClueResource): any {
+  return { clue, type: CLUE_UPDATE };
+}
+
+export function clueUpdateRequest(clue: ClueModel): any {
+  return (dispatch: Dispatch, getState: AppState) => {
+    dispatch(loadingState());
+    api.updateClue(clue).then((clue: ClueResource) => dispatch(clueUpdate(clue)));
+  }
+}
+
+
+export const CHAPTER_UPDATE = 'CHAPTER_UPDATE';
+function savedClue(clue: ClueResource, chapterID: number): any {
+  return { clue, chapterID, type: CHAPTER_UPDATE };
+}
+
+export function updateChapter(chapterID: number, clue: ClueField) {
+  return (dispatch: Dispatch, getState: AppState) => {
+    dispatch(loadingState());                                                                                         ``
+    api.addClueToChapter(clue, chapterID).then(clue => dispatch(savedClue(clue, chapterID)));
+  }
+}
 
 
 export const REFRESH_ENCOUNTERS = 'REFRESH_ENCOUNTERS';
@@ -170,6 +207,14 @@ export function querySpells(query: string): AppUpdate {
   }
 }
 
+export const SCHOOL_FILTER_TOGGLE = 'SCHOOL_FILTER_TOGGLE';
+export function schoolToggle(school: SpellFilter): FilterAction<SpellFilter> {
+  return {
+    type: SCHOOL_FILTER_TOGGLE,
+    filter: school
+  };
+}
+
 
 /* ENCOUNTER STATE LOAD */
 
@@ -197,7 +242,7 @@ function encounterDetailLoad(encounter: Encounter): any {
 //   };
 // }
 
-export function retrieveEncounterData(location: ReactRouter.RouterState, params: { id?: string }): AppUpdate {
+export function retrieveEncounterData(location: ReactRouter.Router, params: { id?: string }): AppUpdate {
   return (dispatch: Dispatch, getState: () => AppState) => {
     let { encounter: encounterState } = getState();
     api.getEncounters(location, params, encounterState.page).then((payload: any) => {
@@ -306,5 +351,64 @@ export function receiveSearchResults(results: SavedCharacter[]): any {
   return {
     characters: results,
     type: CHARACTER_SEARCH_RESULTS
+  };
+}
+
+export const SPELL_LEVEL_TOGGLE = 'SPELL_LEVEL_TOGGLE';
+export function spellLevelToggle(level: number): any {
+  return {
+    type: SPELL_LEVEL_TOGGLE,
+    level
+  }
+}
+
+
+export const SAVED_CHAPTER = 'SAVED_CHAPTER';
+export function savedSettingsStoryboard(chapter: ChapterResource): any {
+  return {
+    type: SAVED_CHAPTER,
+    chapter
+  };
+}
+
+export const LOADING = 'LOADING';
+function loadingState(): any {
+  return {
+    type: LOADING,
+  }
+}
+
+export const CHAPTER_LIST_LOAD = 'CHAPTER_LIST_LOAD';
+function onAllChaptersLoaded(chapters: ChapterResource[]): any {
+  return {
+    type: CHAPTER_LIST_LOAD,
+    chapters
+  };
+}
+
+export const CHAPTER_DETAIL_LOAD = 'CHAPTER_DETAIL_LOAD';
+export function chapterDetailLoad(chapterID: number | string) {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    dispatch(loadingState());
+    api.loadChapterDetail(chapterID).then((chapter: ChapterResource) => {
+      dispatch({ type: CHAPTER_DETAIL_LOAD, chapter });
+    });
+  }
+}
+
+export const CHAPTER_LIST = 'CHAPTER_LIST';
+export function loadChapterList() {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    dispatch(loadingState());
+    api.loadChapterList().then((chapters: ChapterResource[]) => dispatch(onAllChaptersLoaded(chapters)));
+  }
+}
+
+export function saveStoryboardSettings(chapter: ChapterField) {
+  return (dispatch: Dispatch, getState: () => AppState) => {
+    dispatch(loadingState());
+    api.saveChapter(chapter).then((c: ChapterResource) => {
+      dispatch(savedSettingsStoryboard(c))
+    });
   };
 }

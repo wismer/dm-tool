@@ -1,4 +1,4 @@
-import { AppState, CharacterState, NormalizedPayload } from './interfaces';
+import { AppState, CharacterState, NormalizedPayload, APIResource } from './interfaces';
 
 export function fetchPersistentStorage(): AppState | void {
   try {
@@ -75,4 +75,16 @@ export function fetchLocally<T extends Resource>(key: string, query: string): {r
       results: payload.results.filter((c: T) => new RegExp(query, 'i').exec(c.name || ''))
     };
   }
+}
+
+export function combineRelated<P, R, C extends APIResource>(parent: P, childKey: string, propKey: string, related: C[]): R[] {
+  let children: number[] = parent[childKey];
+  return children
+    .map(id => {
+      let rel = related.find(m => m.id === id);
+      if (rel) {
+        return rel[propKey];
+      }
+      return '';
+    });
 }

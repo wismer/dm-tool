@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { Encounter, EncounterListProps, AppState } from '../interfaces';
 import {
   ListGroup,
@@ -11,6 +11,8 @@ import {
 } from 'react-bootstrap';
 import { withRouter } from 'react-router';
 import { encounterListDispatch } from '../redux/dispatchers';
+
+
 /*
 ENCOUNTER
   name - text
@@ -60,7 +62,7 @@ type ListProps = EncounterListProps & EncounterDispatch;
 type EncounterListState = { open?: boolean, activePage: number };
 class EncounterListContainer extends React.Component<ListProps, EncounterListState> {
   constructor(props: EncounterListProps) {
-    super(props);
+    super();
     this.state = { open: false, activePage: 1 };
   }
 
@@ -69,7 +71,8 @@ class EncounterListContainer extends React.Component<ListProps, EncounterListSta
   }
 
   fetchData() {
-    this.props.retrieveEncounterData(this.props.location, this.props.params);
+    // FIXME
+    // this.props.retrieveEncounterData(this.props.location, this.props.params);
   }
 
   render() {

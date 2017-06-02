@@ -1,16 +1,18 @@
 import * as React from 'react';
-import { Form, FormGroup, FormControl, Col, Row, Panel } from 'react-bootstrap';
+import { Col, Row, Panel, Pagination } from 'react-bootstrap';
 import { SpellSearchResults, Spell, FormState } from '../interfaces';
 
 
 interface SpellListProps extends SpellSearchResults, FormState {
   handleChange: (e: any) => void;
   spellQuery: string;
+  page: number;
+  children?: any;
 }
-
-const SpellListResult = (props: Spell) => {
+type SpellProps = Spell & { pageBreak: string };
+const SpellListResult = (props: SpellProps) => {
   return (
-    <Panel header={props.name} className='spell-result'>
+    <Panel id={props.pageBreak} header={props.name} className='spell-result'>
       <p>
         {props.desc}
       </p>
@@ -28,21 +30,21 @@ const SpellListResult = (props: Spell) => {
 }
 
 export default function SpellListContainer(props: SpellListProps) {
-  const spellResults = props.results.map((e: Spell, i: number) => <SpellListResult key={i} {...e} />);
+  const { page } = props;
+  const spellResults = props.results.map((e: Spell, i: number) => {
+    return <SpellListResult pageBreak={i % 20 === 0 ? `p${i / 20}` : ''} key={i} {...e} />
+  });
   return (
     <div className='spell-list'>
-      <Form horizontal>
-        <FormGroup controlId='formSpellQuery'>
-          <Col sm={2}>
-          </Col>
-          <Col sm={10}>
-            <FormControl onChange={e => props.handleChange(e.target)} type="search" placeholder="search spell by name" />
-          </Col>
-        </FormGroup>
-      </Form>
+      <div className='search-opts'>
+        {props.children}
+      </div>
+
       <div className='spell-results'>
         {spellResults}
       </div>
+
+      <Pagination items={page} />
     </div>
   );
 }
