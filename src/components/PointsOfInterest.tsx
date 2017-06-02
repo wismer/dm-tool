@@ -159,6 +159,10 @@ class POI extends React.Component<POIWrappedProps & POIProps, POIState> {
     this.setState({ currentOutcomes });
   }
 
+  onDeleteClue(e: React.SyntheticEvent<HTMLDivElement>) {
+    
+  }
+
   onChangeDescription(e: React.SyntheticEvent<HTMLInputElement>) {
     this.setState({ description: e.currentTarget.value });
   }
@@ -317,7 +321,8 @@ class POI extends React.Component<POIWrappedProps & POIProps, POIState> {
                       options={skillsOptions} />
                   </Form.Field>
                   {activeClue > -1 ? outcomeFields : null}
-                  <Button type='submit'>Submit</Button>
+                  <Button color='green' type='submit'>Submit</Button>
+                  <Button color='red' floated='right' onClick={this.onDeleteClue.bind(this)}>Delete</Button>
                 </Form>
               </Segment>
             </Grid.Column>
